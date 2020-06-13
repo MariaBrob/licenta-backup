@@ -25,8 +25,18 @@ const departments = require("./routes/departments");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const db = require("./config/keys").mongoURL;
+const uristring = require("./config/keys").uristring;
+
+// mongoose
+//   .connect(db, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   })
+//   .then(() => console.log("MongoDB successfully connected"))
+//   .catch((err) => console.log(err));
+
 mongoose
-  .connect(db, {
+  .connect(uristring, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
