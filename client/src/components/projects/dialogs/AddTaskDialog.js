@@ -98,13 +98,13 @@ export default function AddTaskDialog(props) {
           <Box m={2}>
             <Autocomplete
               multiple
+              disableCloseOnSelect={true}
               options={projectTeam}
               getOptionLabel={(option) => option.name}
               value={taskTeam}
               onChange={(event, newValue) => {
                 setTaskTeam(newValue);
               }}
-              disableCloseOnSelect={true}
               renderInput={(params) => (
                 <TextField {...params} variant="standard" label={"Team"} />
               )}

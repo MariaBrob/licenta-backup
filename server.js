@@ -21,6 +21,7 @@ const users = require("./routes/users.js");
 const members = require("./routes/members.js");
 const projects = require("./routes/projects");
 const departments = require("./routes/departments");
+const comments = require("./routes/comments");
 
 const mongoose = require("mongoose");
 const passport = require("passport");
@@ -55,6 +56,7 @@ app.use("/api/users", users);
 app.use("/api/members", members);
 app.use("/api/projects", projects);
 app.use("/api/departments", departments);
+app.use("/api/comments", comments);
 
 var server = app.listen(process.env.PORT || 5000, function () {
   var port = server.address().port;

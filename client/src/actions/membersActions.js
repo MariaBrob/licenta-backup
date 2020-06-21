@@ -5,10 +5,21 @@ import {
   GET_VOLUNTEERS,
   GET_VOLUNTEERS_DEP,
   GET_VOLUNTEER_BY_ID,
+  GET_VOLUNTEER_PROJECTS,
+  GET_VOLUNTEER_COMMENTS,
 } from "./types";
 
 export const addVolunteer = (data) => (dispatch) => {
   axios.post("/api/members/addVolunteer", data).catch((err) =>
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data,
+    })
+  );
+};
+
+export const updateVolunteer = (data) => (dispatch) => {
+  axios.post("/api/members/updateVolunteer", data).catch((err) =>
     dispatch({
       type: GET_ERRORS,
       payload: err.response.data,
@@ -86,4 +97,50 @@ export const returnVolunteerByID = (id) => {
       })
       .catch((err) => reject(err));
   });
+};
+
+export const addComment = (volunteer_id, date, comment) => (dispatch) => {
+  axios
+    .post("/api/comments/addComment", { volunteer_id, date, comment })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getComments = (volunteer_id) => (dispatch) => {
+  axios
+    .get("/api/comments/getComments/" + volunteer_id)
+    .then((res) => {
+      dispatch({
+        type: GET_VOLUNTEER_COMMENTS,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getVolunteerProjects = (volunteer_id) => (dispatch) => {
+  axios
+    .get("/api/members/getVolunteerProjects/" + volunteer_id)
+    .then((res) => {
+      console.log(res.data);
+      dispatch({
+        type: GET_VOLUNTEER_PROJECTS,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
 };

@@ -191,6 +191,18 @@ export const getProjectTasks = (id) => (dispatch) => {
     });
 };
 
+export const returnProjectTasks = (id) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .get("/api/projects/getProjectTasks/" + id)
+      .then((res) => {
+        console.log(res);
+        resolve(res);
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 export const getProjectTaskByID = (id) => (dispatch) => {
   console.log(id);
   axios

@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Volunteer = require("../models/volunteers.js");
+const Project = require("../models/project.js");
+const Tasks = require("../models/task.js");
 
 router.post("/addVolunteer", (req, res) => {
-  console.log(req.body);
   const newVolunteer = new Volunteer({
     name: req.body.name,
     email: req.body.email,
@@ -39,8 +40,47 @@ router.get("/getVolunteers", (req, res) => {
 router.get("/getVolunteerByID/:id", (req, res) => {
   Volunteer.find({ _id: req.params.id })
     .then((volunteer) => {
-      console.log(volunteer);
       res.json(volunteer);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.json(err);
+    });
+});
+
+router.get("/getVolunteerProjects/:id", (req, res) => {
+  const { id } = req.params;
+  var vol_projects = [];
+
+  Volunteer.find({ _id: id })
+    .then((volunteer) => {
+      Project.find({})
+        .then((projects) => {
+          projects.forEach((element) => {
+            if (element.team_id.includes(id)) {
+              vol_projects.push(element);
+            }
+          });
+          console.log(vol_projects);
+          res.json(vol_projects);
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.json(err);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.json(err);
+    });
+});
+
+router.get("/getVolunteerProjectsTasks/:id", (req, res) => {
+  const { id } = req.params;
+
+  Project.find({ _id: id })
+    .then((tasks) => {
+      res.json(tasks);
     })
     .catch((err) => {
       console.log(err);

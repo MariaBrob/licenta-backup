@@ -48,8 +48,16 @@ const useStyles = makeStyles({
     marginBottom: 12,
   },
   bullet: {
-    paddingLeft: "10px",
+    // paddingLeft: "10px",
     paddingRight: "10px",
+  },
+  littleEye: {
+    fontSize: "1.2rem",
+    paddingLeft: "2px",
+  },
+  littleEyeButton: {
+    paddingLeft: "4px",
+    paddingRight: "0px",
   },
 });
 
@@ -204,7 +212,7 @@ export default function CustomizedDialogs(props) {
                               size="small"
                               onClick={() => handleOpenAddTaskDialog()}
                             >
-                              Print sent
+                              Finish project
                             </Button>
                           </Grid>
                         </Grid>
@@ -256,6 +264,15 @@ export default function CustomizedDialogs(props) {
                                             {bull}
                                             &nbsp;
                                             {element.name}
+                                            <IconButton
+                                              className={
+                                                classes.littleEyeButton
+                                              }
+                                            >
+                                              <RemoveRedEye
+                                                className={classes.littleEye}
+                                              />
+                                            </IconButton>
                                           </Typography>
                                         </Box>
                                       );

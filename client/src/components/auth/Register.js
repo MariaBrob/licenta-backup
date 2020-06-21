@@ -17,11 +17,11 @@ class Register extends Component {
     };
   }
 
-  componentDidMount() {
-    if (this.props.auth.isAuthenticated) {
-      this.props.history.push("/projects");
-    }
-  }
+  // componentDidMount() {
+  //   if (this.props.auth.isAuthenticated) {
+  //     this.props.history.push("/projects");
+  //   }
+  // }
 
   componentWillReceiveProps(nextProps) {
     console.log(nextProps);

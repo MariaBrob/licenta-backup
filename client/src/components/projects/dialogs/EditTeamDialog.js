@@ -44,7 +44,12 @@ export default function AlertDialog(props) {
 
   return (
     <div>
-      <Dialog open={props.open} onClose={props.handleClose}>
+      <Dialog
+        open={props.open}
+        onClose={props.handleClose}
+        fullWidth={true}
+        maxWidth={"sm"}
+      >
         <DialogTitle>Edit Project Team</DialogTitle>
         <DialogContent>
           {departments.map((department, index) => {
