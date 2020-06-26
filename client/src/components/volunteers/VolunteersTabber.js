@@ -11,15 +11,26 @@ import {
   Tab,
   AppBar,
   Typography,
+  Button,
 } from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
 
-import VolunteersTable from "../../components/volunteers/VolunteersTable";
+import VolunteersTable from "./VolunteersTable";
+import AddVolunteerDialog from "./dialogs/AddVolunteerDialog";
 
 const styles = (theme) => ({
   root: {
     backgroundColor: theme.palette.background.paper,
   },
 });
+
+const ButtonInTabs = ({ className, onClick, children }) => {
+  return (
+    <Box display="flex" flexDirection="row-reverse">
+      <Button className={className} onClick={onClick} children={children} />
+    </Box>
+  );
+};
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -50,6 +61,7 @@ class VolunteersTabber extends Component {
     super(props);
     this.state = {
       value: 0,
+      openAddDialog: false,
     };
   }
 
@@ -75,6 +87,19 @@ class VolunteersTabber extends Component {
     });
   }
 
+  handleOpenAddDialog = () => {
+    console.log("hbsdjhvb");
+    this.setState({
+      openAddDialog: true,
+    });
+  };
+
+  handleCloseAddDialog = () => {
+    this.setState({
+      openAddDialog: false,
+    });
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -97,6 +122,13 @@ class VolunteersTabber extends Component {
                     textColor="primary"
                   >
                     {this.renderTabs()}
+                    <ButtonInTabs
+                      onClick={() => this.handleOpenAddDialog()}
+                      className={classes.addButton}
+                    >
+                      <AddIcon color="secondary" />
+                      Add volunteer
+                    </ButtonInTabs>
                   </Tabs>
                 </AppBar>
                 <SwipeableViews index={this.state.value}>
@@ -106,6 +138,11 @@ class VolunteersTabber extends Component {
             </Paper>
           </Grid>
         </Grid>
+
+        <AddVolunteerDialog
+          open={this.state.openAddDialog}
+          handleClose={this.handleCloseAddDialog}
+        />
       </div>
     );
   }

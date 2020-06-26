@@ -6,7 +6,7 @@ const tf = require("@tensorflow/tfjs");
 const fetch = require("node-fetch");
 // require("@tensorflow/tfjs-node");
 
-router.get("/getDepartments", (req, res) => {
+router.get("/getDepartments/", (req, res) => {
   // const getMetaData = async () => {
   //   const metadata = await fetch(
   //     "https://storage.googleapis.com/tfjs-models/tfjs/sentiment_cnn_v1/metadata.json"

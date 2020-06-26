@@ -6,10 +6,9 @@ export const getDepartments = () => (dispatch) => {
   axios
     .get("/api/departments/getDepartments")
     .then((res) => {
-      const volunteers = res.data;
       dispatch({
         type: GET_DEPARTMENTS,
-        payload: volunteers,
+        payload: res.data,
       });
     })
     .catch((err) => {

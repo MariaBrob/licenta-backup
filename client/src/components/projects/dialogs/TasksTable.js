@@ -76,6 +76,7 @@ export default function StickyHeadTable(props) {
 
   React.useEffect(() => {
     renderTableCells();
+    // eslint-disable-next-line
   }, [selectedProjectTasks]);
 
   const renderTableCells = () => {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   makeStyles,
   Grid,
@@ -12,9 +12,7 @@ import {
   IconButton,
   MenuItem,
   Select,
-  Button,
   TableContainer,
-  TablePagination,
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/EditOutlined";
 import DoneIcon from "@material-ui/icons/DoneAllTwoTone";
@@ -25,7 +23,6 @@ import VolunteerDialog from "./VolunteerDialog";
 import { useSelector, useDispatch } from "react-redux";
 import {
   getVolunteerByID,
-  addVolunteer,
   updateVolunteer,
   getVolunteerProjects,
   getComments,
@@ -35,10 +32,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     marginTop: theme.spacing(3),
-    // overflowX: "auto",
+    overflowX: "auto",
   },
   table: {
     minWidth: "100%",
+  },
+  container: {
+    maxHeight: 550,
+    overflow: "scroll",
   },
   head: {
     backgroundColor: "rgb(4, 57, 108)",
@@ -49,11 +50,11 @@ const useStyles = makeStyles((theme) => ({
   },
   tableCell: {
     // width: 130,
-    height: 40,
+    height: 25,
   },
   input: {
     // width: 130,
-    height: 40,
+    height: 25,
   },
 }));
 
@@ -63,6 +64,7 @@ const createData = (
   work_email,
   phone,
   department,
+  university,
   start_year,
   end_year,
   id,
@@ -74,6 +76,7 @@ const createData = (
   work_email,
   phone,
   department,
+  university,
   start_year,
   end_year,
   id,
@@ -84,7 +87,9 @@ const createData = (
 const CustomTableCell = ({ row, name, onChange, type }) => {
   const classes = useStyles();
   const { isEditMode } = row;
-  const volunteers = useSelector((state) => state.volunteers.allVolunteers);
+  const departments = useSelector((state) => state.departments.allDepartments);
+  const year = new Date("01/01/2000").getFullYear();
+  const years = Array.from(new Array(30), (val, index) => index + year);
 
   if (type === "input") {
     return (
@@ -103,36 +108,84 @@ const CustomTableCell = ({ row, name, onChange, type }) => {
       </TableCell>
     );
   } else if (type === "dropdown") {
-    return (
-      <TableCell align="left" className={classes.tableCell}>
-        {isEditMode ? (
-          <Select
-            value={row[name]}
-            name={name}
-            onChange={(e) => onChange(e, row)}
-            className={classes.input}
-          >
-            <MenuItem key={100} value={""}>
-              <em>NONE</em>
-            </MenuItem>
-            {volunteers.map((volunteer, index) => {
-              return (
-                <MenuItem
-                  label="Select entity"
-                  value={volunteer.name}
-                  key={index}
-                  name={volunteer.name}
-                >
-                  {volunteer.name}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        ) : (
-          row[name]
-        )}
-      </TableCell>
-    );
+    if (name === "department") {
+      return (
+        <TableCell align="left" className={classes.tableCell}>
+          {isEditMode ? (
+            <Select
+              value={row[name]}
+              name={name}
+              onChange={(e) => onChange(e, row)}
+              className={classes.input}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {departments.map((dep, index) => {
+                return (
+                  <MenuItem key={index} value={dep.name}>
+                    {dep.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          ) : (
+            row[name]
+          )}
+        </TableCell>
+      );
+    } else if (name === "start_year") {
+      return (
+        <TableCell align="left" className={classes.tableCell}>
+          {isEditMode ? (
+            <Select
+              value={row[name]}
+              name={name}
+              onChange={(e) => onChange(e, row)}
+              className={classes.input}
+              label="Started in"
+            >
+              {years.map((year, index) => {
+                return (
+                  <MenuItem value={year} key={index}>
+                    {year}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          ) : (
+            row[name]
+          )}
+        </TableCell>
+      );
+    } else if (name === "end_year") {
+      return (
+        <TableCell align="left" className={classes.tableCell}>
+          {isEditMode ? (
+            <Select
+              value={row[name]}
+              name={name}
+              onChange={(e) => onChange(e, row)}
+              className={classes.input}
+              label="Finished in"
+            >
+              <MenuItem value="present">
+                <em>Present</em>
+              </MenuItem>
+              {years.map((year, index) => {
+                return (
+                  <MenuItem value={year} key={index}>
+                    {year}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          ) : (
+            row[name]
+          )}
+        </TableCell>
+      );
+    }
   }
 };
 
@@ -146,40 +199,35 @@ function ProjectsTable(props) {
   const [rows, setRows] = React.useState([]);
   const [previous, setPrevious] = React.useState({});
   const [openDialog, setOpen] = React.useState(false);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
   var depRows = [];
-  volunteers.forEach((volunteer) => {
-    if (props.department.name === volunteer.department) {
-      depRows.push(
-        createData(
-          volunteer.name,
-          volunteer.email,
-          volunteer.work_email,
-          volunteer.phone,
-          volunteer.department,
-          volunteer.start_year,
-          volunteer.end_year,
-          volunteer._id,
-          false
-        )
-      );
-    }
-  });
+
+  useEffect(() => {
+    volunteers.forEach((volunteer) => {
+      if (props.department.name === volunteer.department) {
+        depRows.push(
+          createData(
+            volunteer.name,
+            volunteer.email,
+            volunteer.work_email,
+            volunteer.phone,
+            volunteer.department,
+            volunteer.university,
+            volunteer.start_year,
+            volunteer.end_year,
+            volunteer._id,
+            false
+          )
+        );
+      }
+    });
+
+    setRows(depRows);
+    // eslint-disable-next-line
+  }, [volunteers]);
 
   if (depRows.length !== 0 && rows.length === 0) {
     setRows(depRows);
   }
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
 
   const handleOpenDialog = (id) => {
     setOpen(true);
@@ -203,21 +251,10 @@ function ProjectsTable(props) {
     });
   };
 
-  const onAdd = () => {
-    depRows.push(
-      createData("", "", "", "", "", "", "", "", "insert", true, "insert")
-    );
-    setRows(depRows);
-  };
-
   const onUpdate = (id, type) => {
     rows.forEach((row) => {
       if (row.id === id) {
-        if (type !== "insert") {
-          return dispatch(updateVolunteer(row));
-        } else {
-          dispatch(addVolunteer(row));
-        }
+        return dispatch(updateVolunteer(row));
       } else return false;
     });
     onToggleEditMode(id);
@@ -241,27 +278,18 @@ function ProjectsTable(props) {
   };
 
   const onRevert = (id, type) => {
-    if (type === "insert") {
-      rows.pop();
-      setRows(rows);
+    const newRows = rows.map((row) => {
+      if (row.id === id) {
+        return previous[id] ? previous[id] : row;
+      }
+      return row;
+    });
+    setRows(newRows);
+    setPrevious((state) => {
+      delete state[id];
+      return state;
+    });
 
-      setPrevious((state) => {
-        delete state["insert"];
-        return state;
-      });
-    } else {
-      const newRows = rows.map((row) => {
-        if (row.id === id) {
-          return previous[id] ? previous[id] : row;
-        }
-        return row;
-      });
-      setRows(newRows);
-      setPrevious((state) => {
-        delete state[id];
-        return state;
-      });
-    }
     onToggleEditMode(id);
   };
 
@@ -277,26 +305,11 @@ function ProjectsTable(props) {
 
   return (
     <span className={classes.root}>
-      {/* <Grid
-        container
-        spacing={3}
-        alignItems="flex-end"
-        alignContent="flex-end"
-        justify="flex-end"
-        direction="row"
-      >
-        <Grid item md={2} align="right">
-          <Button variant="outlined" onClick={onAdd}>
-            Add volunteer
-          </Button>
-        </Grid>
-      </Grid> */}
-
       <Grid container spacing={2}>
         <Grid item md={12}>
           <Paper>
             <TableContainer className={classes.container}>
-              <Table className={classes.table}>
+              <Table stickyHeader className={classes.table}>
                 <TableHead>
                   <TableRow>
                     <TableCell className={classes.head} align="left">
@@ -326,94 +339,83 @@ function ProjectsTable(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => (
-                      <TableRow key={row.id}>
-                        <CustomTableCell
-                          {...{ row, name: "name", onChange, type: "input" }}
-                        />
-                        <CustomTableCell
-                          {...{ row, name: "email", onChange, type: "input" }}
-                        />
-                        <CustomTableCell
-                          {...{
-                            row,
-                            name: "work_email",
-                            onChange,
-                            type: "input",
-                          }}
-                        />
-                        <CustomTableCell
-                          {...{ row, name: "phone", onChange, type: "input" }}
-                        />
-                        <CustomTableCell
-                          {...{
-                            row,
-                            name: "department",
-                            onChange,
-                            type: "dropdown",
-                          }}
-                        />
-                        <CustomTableCell
-                          {...{
-                            row,
-                            name: "start_year",
-                            onChange,
-                            type: "input",
-                          }}
-                        />
-                        <CustomTableCell
-                          {...{
-                            row,
-                            name: "end_year",
-                            onChange,
-                            type: "input",
-                          }}
-                        />
-                        <TableCell className={classes.selectTableCell}>
-                          {row.isEditMode ? (
-                            <>
-                              <IconButton
-                                onClick={() => onUpdate(row.id, row.type)}
-                              >
-                                <DoneIcon />
-                              </IconButton>
-                              <IconButton
-                                onClick={() => onRevert(row.id, row.type)}
-                              >
-                                <RevertIcon />
-                              </IconButton>
-                            </>
-                          ) : (
-                            <>
-                              <IconButton
-                                onClick={() => onToggleEditMode(row.id)}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                              <IconButton
-                                onClick={() => handleOpenDialog(row.id)}
-                              >
-                                <RemoveRedEye />
-                              </IconButton>
-                            </>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      <CustomTableCell
+                        {...{ row, name: "name", onChange, type: "input" }}
+                      />
+                      <CustomTableCell
+                        {...{ row, name: "email", onChange, type: "input" }}
+                      />
+                      <CustomTableCell
+                        {...{
+                          row,
+                          name: "work_email",
+                          onChange,
+                          type: "input",
+                        }}
+                      />
+                      <CustomTableCell
+                        {...{ row, name: "phone", onChange, type: "input" }}
+                      />
+                      <CustomTableCell
+                        {...{
+                          row,
+                          name: "department",
+                          onChange,
+                          type: "dropdown",
+                        }}
+                      />
+                      <CustomTableCell
+                        {...{
+                          row,
+                          name: "start_year",
+                          onChange,
+                          type: "dropdown",
+                        }}
+                      />
+                      <CustomTableCell
+                        {...{
+                          row,
+                          name: "end_year",
+                          onChange,
+                          type: "dropdown",
+                        }}
+                      />
+                      <TableCell className={classes.selectTableCell}>
+                        {row.isEditMode ? (
+                          <>
+                            <IconButton
+                              onClick={() => onUpdate(row.id, row.type)}
+                            >
+                              <DoneIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => onRevert(row.id, row.type)}
+                            >
+                              <RevertIcon />
+                            </IconButton>
+                          </>
+                        ) : (
+                          <>
+                            <IconButton
+                              onClick={() => onToggleEditMode(row.id)}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleOpenDialog(row.id)}
+                            >
+                              <RemoveRedEye />
+                            </IconButton>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-            />
           </Paper>
         </Grid>
       </Grid>

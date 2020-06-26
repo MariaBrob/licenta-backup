@@ -58,6 +58,14 @@ app.use("/api/projects", projects);
 app.use("/api/departments", departments);
 app.use("/api/comments", comments);
 
+app.use(express.static(__dirname));
+
+console.log(__dirname);
+
+app.use("*", (req, res, next) => {
+  res.sendFile(path.resolve(__dirname + "/client/public/index.html"));
+});
+
 var server = app.listen(process.env.PORT || 5000, function () {
   var port = server.address().port;
   console.log("Express is working on port " + port);

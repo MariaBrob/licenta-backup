@@ -26,6 +26,36 @@ router.post("/addVolunteer", (req, res) => {
     });
 });
 
+router.post("/updateVolunteer", (req, res) => {
+  Volunteer.updateOne(
+    { _id: req.body._id ? req.body._id : req.body.id },
+    {
+      name: req.body.name,
+      email: req.body.email,
+      work_email: req.body.work_email,
+      phone: req.body.phone,
+      university: req.body.university,
+      department: req.body.department,
+      start_year: req.body.start_year,
+      end_year: req.body.end_year,
+    }
+  )
+    .then(() => {
+      Volunteer.find({})
+        .then((vol) => {
+          res.json(vol);
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(500).send("Error updating volunteer");
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).send("Error updating volunteer");
+    });
+});
+
 router.get("/getVolunteers", (req, res) => {
   Volunteer.find({})
     .then((volunteers) => {
@@ -61,7 +91,6 @@ router.get("/getVolunteerProjects/:id", (req, res) => {
               vol_projects.push(element);
             }
           });
-          console.log(vol_projects);
           res.json(vol_projects);
         })
         .catch((err) => {

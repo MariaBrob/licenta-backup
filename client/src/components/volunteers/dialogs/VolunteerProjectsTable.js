@@ -16,8 +16,8 @@ import {
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@material-ui/icons/KeyboardArrowUp";
 
-import { useDispatch, useSelector } from "react-redux";
-import { returnProjectTasks } from "../../actions/projectsActions";
+import { useSelector } from "react-redux";
+import { returnProjectTasks } from "../../../actions/projectsActions";
 
 const columns = [
   { id: "id", label: "ID", minWidth: 10 },
@@ -41,10 +41,6 @@ function createData(_id, id, year, name, pm) {
     year,
     name,
     pm,
-    history: [
-      { date: "2020-01-05", customerId: "11091700", amount: 3 },
-      { date: "2020-01-02", customerId: "Anonymous", amount: 1 },
-    ],
   };
 }
 
@@ -59,7 +55,6 @@ const useStyles = makeStyles({
 
 export default function StickyHeadTable(props) {
   const classes = useStyles();
-  const dispatch = useDispatch();
   const selectedVolunteerProjects = useSelector(
     (state) => state.volunteers.selectedVolunteerProjects
   );
@@ -68,6 +63,7 @@ export default function StickyHeadTable(props) {
 
   React.useEffect(() => {
     renderTableCells();
+    // eslint-disable-next-line
   }, [selectedVolunteerProjects]);
 
   const renderTableCells = () => {

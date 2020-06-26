@@ -196,7 +196,6 @@ export const returnProjectTasks = (id) => {
     axios
       .get("/api/projects/getProjectTasks/" + id)
       .then((res) => {
-        console.log(res);
         resolve(res);
       })
       .catch((err) => reject(err));
@@ -204,7 +203,6 @@ export const returnProjectTasks = (id) => {
 };
 
 export const getProjectTaskByID = (id) => (dispatch) => {
-  console.log(id);
   axios
     .get("/api/projects/getProjectTaskByID/" + id)
     .then((res) => {

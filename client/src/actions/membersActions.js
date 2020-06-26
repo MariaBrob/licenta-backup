@@ -19,12 +19,21 @@ export const addVolunteer = (data) => (dispatch) => {
 };
 
 export const updateVolunteer = (data) => (dispatch) => {
-  axios.post("/api/members/updateVolunteer", data).catch((err) =>
-    dispatch({
-      type: GET_ERRORS,
-      payload: err.response.data,
+  console.log(data);
+  axios
+    .post("/api/members/updateVolunteer", data)
+    .then((res) => {
+      dispatch({
+        type: GET_VOLUNTEERS,
+        payload: res.data,
+      });
     })
-  );
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
 };
 
 export const deleteVolunteer = (data) => (dispatch) => {
@@ -100,8 +109,20 @@ export const returnVolunteerByID = (id) => {
 };
 
 export const addComment = (volunteer_id, date, comment) => (dispatch) => {
+  let volunteerby_id = localStorage.getItem("user_id");
   axios
-    .post("/api/comments/addComment", { volunteer_id, date, comment })
+    .post("/api/comments/addComment", {
+      volunteer_id,
+      volunteerby_id,
+      date,
+      comment,
+    })
+    .then((res) => {
+      dispatch({
+        type: GET_VOLUNTEER_COMMENTS,
+        payload: res.data,
+      });
+    })
     .catch((err) =>
       dispatch({
         type: GET_ERRORS,
