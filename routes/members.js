@@ -139,4 +139,138 @@ router.post("/deleteVolunteer", (req, res) => {
     });
 });
 
+router.post("/updateVolunteerPointsFinishTask", (req, res) => {
+  const { volunteer_id, year, type_finished, task_difficulty } = req.body;
+
+  Volunteer.findOne({
+    _id: volunteer_id,
+  })
+    .then((resp) => {
+      let vol_points = resp.points;
+      let year_index = vol_points.findIndex(({ year }) => year == year);
+
+      if (type_finished === "finished") {
+        if (task_difficulty === "Low") {
+          if (year_index === -1) {
+            vol_points.push({ year: year, points: 10 });
+          } else {
+            vol_points[year_index].points += 10;
+          }
+        } else if (task_difficulty === "Medium") {
+          if (year_index === -1) {
+            vol_points.push({ year: year, points: 20 });
+          } else {
+            vol_points[year_index].points += 20;
+          }
+        } else if (task_difficulty === "High") {
+          if (year_index === -1) {
+            vol_points.push({ year: year, points: 30 });
+          } else {
+            vol_points[year_index].points += 30;
+          }
+        }
+      } else if (type_finished === "finished with problems") {
+        if (task_difficulty === "Low") {
+          if (year_index === -1) {
+            vol_points.push({ year: year, points: -10 });
+          } else {
+            vol_points[year_index].points -= 10;
+          }
+        } else if (task_difficulty === "Medium") {
+          if (year_index === -1) {
+            vol_points.push({ year: year, points: -20 });
+          } else {
+            vol_points[year_index].points -= 20;
+          }
+        } else if (task_difficulty === "High") {
+          if (year_index === -1) {
+            vol_points.push({ year: year, points: -30 });
+          } else {
+            vol_points[year_index].points -= 30;
+          }
+        }
+      }
+
+      Volunteer.updateOne(
+        { _id: volunteer_id },
+        {
+          points: vol_points,
+        }
+      )
+        .then(() => {
+          Volunteer.find({})
+            .then((vol) => {
+              res.json(vol);
+            })
+            .catch((err) => {
+              console.log(err);
+              return res
+                .status(500)
+                .send({ message: "Error updating volunteer points" });
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(500).json({
+            message: "Error updating volunteer points",
+          });
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ message: "Error updating volunteer points" });
+    });
+});
+
+router.post("/updateVolunteerPointsNewTask", (req, res) => {
+  const { volunteer_id, year, task_difficulty } = req.body;
+
+  Volunteer.findOne({
+    _id: volunteer_id,
+  })
+    .then((resp) => {
+      let vol_points = resp.points;
+      let year_index = vol_points.findIndex(({ year }) => year == year);
+
+      if (year_index === -1) {
+        vol_points.push({ year: year, points: 25 });
+      } else {
+        vol_points[year_index].points += 25;
+      }
+
+      Volunteer.updateOne(
+        { _id: volunteer_id },
+        {
+          points: vol_points,
+        }
+      )
+        .then(() => {
+          Volunteer.find({})
+            .then((vol) => {
+              res.json(vol);
+            })
+            .catch((err) => {
+              console.log(err);
+              return res
+                .status(500)
+                .send({ message: "Error updating volunteer points" });
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(500).json({
+            message: "Error updating volunteer points",
+          });
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ message: "Error updating volunteer points" });
+    });
+});
+
 module.exports = router;

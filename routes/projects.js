@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const Volunteer = require("../models/volunteers.js");
 const Project = require("../models/project.js");
 const Task = require("../models/task.js");
 
@@ -8,7 +9,9 @@ router.post("/addProject", (req, res) => {
     name: req.body.name,
     year: req.body.year,
     pm: req.body.pm,
+    pm_id: req.body.pm_id,
     mentor: req.body.mentor,
+    mentor_id: req.body.mentor_id,
     budget: req.body.budget,
     team: [
       {
@@ -27,43 +30,468 @@ router.post("/addProject", (req, res) => {
     .then(() => {
       Project.find({})
         .then((projects) => {
-          res.json(projects);
+          //pm points
+          Volunteer.findOne({
+            _id: req.body.pm_id,
+          })
+            .then((resp) => {
+              let vol_points = resp.points;
+              let year_index = vol_points.findIndex(
+                ({ year }) => year == req.body.year
+              );
+
+              if (year_index === -1) {
+                vol_points.push({ year: req.body.year, points: 250 });
+              } else {
+                vol_points[year_index].points += 250;
+              }
+
+              Volunteer.updateOne(
+                { _id: req.body.pm_id },
+                {
+                  points: vol_points,
+                }
+              )
+                .then(() => {
+                  //mentor points
+                  Volunteer.findOne({
+                    _id: req.body.mentor_id,
+                  })
+                    .then((resp) => {
+                      let vol_points = resp.points;
+                      let year_index = vol_points.findIndex(
+                        ({ year }) => year == req.body.year
+                      );
+
+                      if (year_index === -1) {
+                        vol_points.push({ year: req.body.year, points: 100 });
+                      } else {
+                        vol_points[year_index].points += 100;
+                      }
+
+                      Volunteer.updateOne(
+                        { _id: req.body.mentor_id },
+                        {
+                          points: vol_points,
+                        }
+                      )
+                        .then(() => {
+                          res.json(projects);
+                        })
+                        .catch((err) => {
+                          console.log(err);
+                          return res.status(500).json({
+                            message: "Error updating volunteer points",
+                          });
+                        });
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                      return res
+                        .status(500)
+                        .json({ message: "Error updating volunteer points" });
+                    });
+                })
+                .catch((err) => {
+                  console.log(err);
+                  return res
+                    .status(500)
+                    .json({ message: "Error updating volunteer points" });
+                });
+            })
+            .catch((err) => {
+              console.log(err);
+              return res
+                .status(500)
+                .json({ message: "Error updating volunteer points" });
+            });
         })
         .catch((err) => {
           console.log(err);
-          return res.status(500).send("Error updating project");
+          return res.status(500).send({ message: "Error inserting project" });
         });
     })
     .catch((err) => {
       console.log(err);
-      return res.status(500).send("Error adding new project");
+      return res.status(500).send({ message: "Error adding new project" });
     });
 });
 
 router.put("/updateProject", (req, res) => {
+  console.log(req.body);
   Project.updateOne(
-    { _id: req.body.id },
+    { _id: req.body._id ? req.body._id : req.body.id },
     {
       name: req.body.name,
       year: req.body.year,
       pm: req.body.pm,
+      pm_id: req.body.pm_id,
       mentor: req.body.mentor,
+      mentor_id: req.body.mentor_id,
       budget: req.body.budget,
     }
   )
     .then(() => {
-      Project.find({})
-        .then((projects) => {
-          res.json(projects);
+      if (
+        req.body.old_pm_id !== undefined &&
+        req.body.old_mentor_id === undefined
+      ) {
+        //update old pm points
+        Volunteer.findOne({
+          _id: req.body.old_pm_id,
         })
-        .catch((err) => {
-          console.log(err);
-          return res.status(500).send("Error updating project");
-        });
+          .then((resp) => {
+            let vol_points = resp.points;
+            let year_index = vol_points.findIndex(
+              ({ year }) => year == req.body.year
+            );
+
+            if (year_index === -1) {
+              vol_points.push({ year: req.body.year, points: 0 });
+            } else {
+              vol_points[year_index].points -= 200;
+            }
+
+            Volunteer.updateOne(
+              { _id: req.body.old_pm_id },
+              {
+                points: vol_points,
+              }
+            )
+              .then(() => {
+                //update new pm points
+                Volunteer.findOne({
+                  _id: req.body.pm_id,
+                })
+                  .then((resp) => {
+                    let vol_points = resp.points;
+                    let year_index = vol_points.findIndex(
+                      ({ year }) => year == req.body.year
+                    );
+
+                    if (year_index === -1) {
+                      vol_points.push({ year: req.body.year, points: 250 });
+                    } else {
+                      vol_points[year_index].points += 250;
+                    }
+
+                    Volunteer.updateOne(
+                      { _id: req.body.pm_id },
+                      {
+                        points: vol_points,
+                      }
+                    )
+                      .then(() => {
+                        Project.find({})
+                          .then((projects) => {
+                            res.json(projects);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            return res
+                              .status(500)
+                              .send({ message: "Error updating project" });
+                          });
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        return res.status(500).json({
+                          message: "Error updating volunteer points",
+                        });
+                      });
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    return res
+                      .status(500)
+                      .json({ message: "Error updating volunteer points" });
+                  });
+              })
+              .catch((err) => {
+                console.log(err);
+                return res.status(500).json({
+                  message: "Error updating volunteer points",
+                });
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+            return res
+              .status(500)
+              .json({ message: "Error updating volunteer points" });
+          });
+      } else if (
+        req.body.old_pm_id === undefined &&
+        req.body.old_mentor_id !== undefined
+      ) {
+        //update old mentor points
+        Volunteer.findOne({
+          _id: req.body.old_mentor_id,
+        })
+          .then((resp) => {
+            let vol_points = resp.points;
+            let year_index = vol_points.findIndex(
+              ({ year }) => year == req.body.year
+            );
+
+            if (year_index === -1) {
+              vol_points.push({ year: req.body.year, points: 0 });
+            } else {
+              vol_points[year_index].points -= 75;
+            }
+
+            Volunteer.updateOne(
+              { _id: req.body.old_mentor_id },
+              {
+                points: vol_points,
+              }
+            )
+              .then(() => {
+                //update new mentor points
+                Volunteer.findOne({
+                  _id: req.body.mentor_id,
+                })
+                  .then((resp) => {
+                    let vol_points = resp.points;
+                    let year_index = vol_points.findIndex(
+                      ({ year }) => year == req.body.year
+                    );
+
+                    if (year_index === -1) {
+                      vol_points.push({ year: req.body.year, points: 100 });
+                    } else {
+                      vol_points[year_index].points += 100;
+                    }
+
+                    Volunteer.updateOne(
+                      { _id: req.body.mentor_id },
+                      {
+                        points: vol_points,
+                      }
+                    )
+                      .then(() => {
+                        Project.find({})
+                          .then((projects) => {
+                            res.json(projects);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            return res
+                              .status(500)
+                              .send({ message: "Error updating project" });
+                          });
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        return res.status(500).json({
+                          message: "Error updating volunteer points",
+                        });
+                      });
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    return res
+                      .status(500)
+                      .json({ message: "Error updating volunteer points" });
+                  });
+              })
+              .catch((err) => {
+                console.log(err);
+                return res.status(500).json({
+                  message: "Error updating volunteer points",
+                });
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+            return res
+              .status(500)
+              .json({ message: "Error updating volunteer points" });
+          });
+      } else if (
+        req.body.old_pm_id !== undefined &&
+        req.body.old_mentor_id !== undefined
+      ) {
+        //update old mentor points
+        Volunteer.findOne({
+          _id: req.body.old_mentor_id,
+        })
+          .then((resp) => {
+            let vol_points = resp.points;
+            let year_index = vol_points.findIndex(
+              ({ year }) => year == req.body.year
+            );
+
+            if (year_index === -1) {
+              vol_points.push({ year: req.body.year, points: 0 });
+            } else {
+              vol_points[year_index].points -= 75;
+            }
+
+            Volunteer.updateOne(
+              { _id: req.body.old_mentor_id },
+              {
+                points: vol_points,
+              }
+            )
+              .then(() => {
+                //update new mentor points
+                Volunteer.findOne({
+                  _id: req.body.mentor_id,
+                })
+                  .then((resp) => {
+                    let vol_points = resp.points;
+                    let year_index = vol_points.findIndex(
+                      ({ year }) => year == req.body.year
+                    );
+
+                    if (year_index === -1) {
+                      vol_points.push({ year: req.body.year, points: 100 });
+                    } else {
+                      vol_points[year_index].points += 100;
+                    }
+
+                    Volunteer.updateOne(
+                      { _id: req.body.mentor_id },
+                      {
+                        points: vol_points,
+                      }
+                    )
+                      .then(() => {
+                        //update old pm points
+                        Volunteer.findOne({
+                          _id: req.body.old_pm_id,
+                        })
+                          .then((resp) => {
+                            let vol_points = resp.points;
+                            let year_index = vol_points.findIndex(
+                              ({ year }) => year == req.body.year
+                            );
+
+                            if (year_index === -1) {
+                              vol_points.push({
+                                year: req.body.year,
+                                points: 0,
+                              });
+                            } else {
+                              vol_points[year_index].points -= 200;
+                            }
+
+                            Volunteer.updateOne(
+                              { _id: req.body.old_pm_id },
+                              {
+                                points: vol_points,
+                              }
+                            )
+                              .then(() => {
+                                //update new pm points
+                                Volunteer.findOne({
+                                  _id: req.body.pm_id,
+                                })
+                                  .then((resp) => {
+                                    let vol_points = resp.points;
+                                    let year_index = vol_points.findIndex(
+                                      ({ year }) => year == req.body.year
+                                    );
+
+                                    if (year_index === -1) {
+                                      vol_points.push({
+                                        year: req.body.year,
+                                        points: 250,
+                                      });
+                                    } else {
+                                      vol_points[year_index].points += 250;
+                                    }
+
+                                    Volunteer.updateOne(
+                                      { _id: req.body.pm_id },
+                                      {
+                                        points: vol_points,
+                                      }
+                                    )
+                                      .then(() => {
+                                        Project.find({})
+                                          .then((projects) => {
+                                            res.json(projects);
+                                          })
+                                          .catch((err) => {
+                                            console.log(err);
+                                            return res.status(500).send({
+                                              message: "Error updating project",
+                                            });
+                                          });
+                                      })
+                                      .catch((err) => {
+                                        console.log(err);
+                                        return res.status(500).json({
+                                          message:
+                                            "Error updating volunteer points",
+                                        });
+                                      });
+                                  })
+                                  .catch((err) => {
+                                    console.log(err);
+                                    return res.status(500).json({
+                                      message:
+                                        "Error updating volunteer points",
+                                    });
+                                  });
+                              })
+                              .catch((err) => {
+                                console.log(err);
+                                return res.status(500).json({
+                                  message: "Error updating volunteer points",
+                                });
+                              });
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            return res.status(500).json({
+                              message: "Error updating volunteer points",
+                            });
+                          });
+                      })
+                      .catch((err) => {
+                        console.log(err);
+                        return res.status(500).json({
+                          message: "Error updating volunteer points",
+                        });
+                      });
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    return res
+                      .status(500)
+                      .json({ message: "Error updating volunteer points" });
+                  });
+              })
+              .catch((err) => {
+                console.log(err);
+                return res.status(500).json({
+                  message: "Error updating volunteer points",
+                });
+              });
+          })
+          .catch((err) => {
+            console.log(err);
+            return res
+              .status(500)
+              .json({ message: "Error updating volunteer points" });
+          });
+      } else {
+        Project.find({})
+          .then((projects) => {
+            res.json(projects);
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.status(500).send({ message: "Error updating project" });
+          });
+      }
     })
     .catch((err) => {
       console.log(err);
-      return res.status(500).send("Error updating project");
+      return res.status(500).send({ message: "Error updating project" });
     });
 });
 
@@ -120,9 +548,62 @@ router.post("/addTask", (req, res) => {
     });
 });
 
+router.post("/finishTask", (req, res) => {
+  const { task_id, status, date_finished } = req.body;
+
+  Task.updateOne(
+    { _id: task_id },
+    {
+      status: status,
+      date_finished: date_finished,
+    }
+  )
+    .then(() => {
+      Task.find({ _id: task_id })
+        .then((task) => {
+          res.json(task);
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(500).send("Error tinishing task");
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).send("Error tinishing task");
+    });
+});
+
+router.post("/finishProject", (req, res) => {
+  const { project_id, status, date_finished } = req.body;
+  console.log(req.body);
+
+  Project.updateOne(
+    { _id: project_id },
+    {
+      status: status,
+      date_finished: date_finished,
+    }
+  )
+    .then(() => {
+      Project.findOne({ _id: project_id })
+        .then((project) => {
+          res.json(project);
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.json(err);
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).send("Error tinishing project");
+    });
+});
+
 router.post("/updateTask", (req, res) => {
   const { task } = req.body;
-  console.log(task);
+
   Task.updateOne(
     { _id: task._id },
     {

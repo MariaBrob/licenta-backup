@@ -9,6 +9,7 @@ var taskSchema = new mongoose.Schema(
     deadline: Date,
     description: String,
     status: String,
+    date_finished: Date,
   },
   {
     versionKey: false,

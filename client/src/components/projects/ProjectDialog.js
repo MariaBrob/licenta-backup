@@ -13,13 +13,13 @@ import {
 } from "@material-ui/core";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import MuiDialogContent from "@material-ui/core/DialogContent";
-import MuiDialogActions from "@material-ui/core/DialogActions";
 import CloseIcon from "@material-ui/icons/Close";
 import RemoveRedEye from "@material-ui/icons/RemoveRedEye";
 
 import { useSelector, useDispatch } from "react-redux";
 import { getProjectByID, getProjectTasks } from "../../actions/projectsActions";
 
+import ProjectDetails from "./dialogs/ProjectDetails";
 import EditTeamDialog from "./dialogs/EditTeamDialog";
 import TasksTable from "./dialogs/TasksTable";
 import AddTaskDialog from "./dialogs/AddTaskDialog";
@@ -43,6 +43,9 @@ const useStyles = makeStyles({
     maxHeight: 500,
     minHeight: 500,
     overflowY: "auto",
+  },
+  cardTitle: {
+    marginBottom: "20px",
   },
   pos: {
     marginBottom: 12,
@@ -84,13 +87,6 @@ const DialogContent = withStyles((theme) => ({
     padding: theme.spacing(2),
   },
 }))(MuiDialogContent);
-
-const DialogActions = withStyles((theme) => ({
-  root: {
-    margin: 0,
-    padding: theme.spacing(1),
-  },
-}))(MuiDialogActions);
 
 export default function CustomizedDialogs(props) {
   const classes = useStyles();
@@ -161,7 +157,11 @@ export default function CustomizedDialogs(props) {
                       <CardContent>
                         <Grid container spacing={2}>
                           <Grid item md={12}>
-                            <Typography variant="h5" component="h2">
+                            <Typography
+                              variant="h5"
+                              component="h2"
+                              className={classes.cardTitle}
+                            >
                               <b>General informations</b>
                             </Typography>
                           </Grid>
@@ -169,51 +169,7 @@ export default function CustomizedDialogs(props) {
 
                         <Grid container spacing={2}>
                           <Grid item md={12}>
-                            <Typography variant="subtitle1" component="h2">
-                              Project manager: <b>{selectedProject.pm}</b>
-                              <IconButton>
-                                <RemoveRedEye />
-                              </IconButton>
-                            </Typography>
-                          </Grid>
-                        </Grid>
-
-                        <Grid container spacing={2}>
-                          <Grid item md={12}>
-                            <Typography variant="subtitle1" component="h2">
-                              Mentor: {selectedProject.mentor}
-                              <IconButton>
-                                <RemoveRedEye />
-                              </IconButton>
-                            </Typography>
-                          </Grid>
-                        </Grid>
-
-                        <Grid container spacing={2}>
-                          <Grid item md={12}>
-                            <Typography variant="subtitle1" component="h2">
-                              Budget: {selectedProject.budget}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-
-                        <Grid container spacing={2}>
-                          <Grid item md={12}>
-                            <Typography variant="subtitle1" component="h2">
-                              Status: {selectedProject.status}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-
-                        <Grid container spacing={2}>
-                          <Grid item md={12}>
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              onClick={() => handleOpenAddTaskDialog()}
-                            >
-                              Finish project
-                            </Button>
+                            <ProjectDetails />
                           </Grid>
                         </Grid>
                       </CardContent>
@@ -231,11 +187,24 @@ export default function CustomizedDialogs(props) {
                   <Grid container spacing={2}>
                     <Grid item md={12}>
                       <CardContent>
-                        <Grid container spacing={2}>
-                          <Grid item md={12}>
+                        <Grid
+                          container
+                          spacing={2}
+                          className={classes.cardTitle}
+                        >
+                          <Grid item md={8}>
                             <Typography variant="h5" component="h2">
                               <b>Team</b>
                             </Typography>
+                          </Grid>
+                          <Grid container item md={4} justify="flex-end">
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleOpenTeamDialog()}
+                            >
+                              Edit team
+                            </Button>
                           </Grid>
                         </Grid>
 
@@ -317,18 +286,30 @@ export default function CustomizedDialogs(props) {
                   <Grid container spacing={2}>
                     <Grid item md={12}>
                       <CardContent>
-                        <Grid container spacing={2}>
-                          <Grid item md={12}>
+                        <Grid
+                          container
+                          spacing={2}
+                          className={classes.cardTitle}
+                        >
+                          <Grid item md={8}>
                             <Typography variant="h5" component="h2">
                               <b>Tasks</b>
                             </Typography>
+                          </Grid>
+                          <Grid container item md={4} justify="flex-end">
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() => handleOpenAddTaskDialog()}
+                            >
+                              Add task
+                            </Button>
                           </Grid>
                         </Grid>
 
                         <Grid container spacing={2}>
                           <Grid item md={12}>
                             {renderTasksTable()}
-                            {/* <TasksTable /> */}
                           </Grid>
                         </Grid>
                       </CardContent>
@@ -340,29 +321,6 @@ export default function CustomizedDialogs(props) {
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleOpenAddTaskDialog()}
-        >
-          Add comment
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleOpenTeamDialog()}
-        >
-          Edit team
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          onClick={() => handleOpenAddTaskDialog()}
-        >
-          Add task
-        </Button>
-      </DialogActions>
 
       <EditTeamDialog
         open={openTeamDialog}

@@ -19,7 +19,6 @@ export const addVolunteer = (data) => (dispatch) => {
 };
 
 export const updateVolunteer = (data) => (dispatch) => {
-  console.log(data);
   axios
     .post("/api/members/updateVolunteer", data)
     .then((res) => {
@@ -84,6 +83,7 @@ export const getVolunteerByID = (id) => (dispatch) => {
   axios
     .get("/api/members/getVolunteerByID/" + id)
     .then((res) => {
+      console.log(res.data[0].points);
       dispatch({
         type: GET_VOLUNTEER_BY_ID,
         payload: res.data,
@@ -152,9 +152,88 @@ export const getVolunteerProjects = (volunteer_id) => (dispatch) => {
   axios
     .get("/api/members/getVolunteerProjects/" + volunteer_id)
     .then((res) => {
-      console.log(res.data);
       dispatch({
         type: GET_VOLUNTEER_PROJECTS,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const updateVolunteerPointsNewTask = (
+  allVolunteersTask,
+  year,
+  difficulty
+) => (dispatch) => {
+  allVolunteersTask.forEach((element) => {
+    axios
+      .post("/api/members/updateVolunteerPointsNewTask", {
+        volunteer_id: element,
+        year: year,
+        task_difficulty: difficulty,
+      })
+      .then((res) => {
+        dispatch({
+          type: GET_VOLUNTEERS,
+          payload: res.data,
+        });
+      })
+      .catch((err) =>
+        dispatch({
+          type: GET_ERRORS,
+          payload: err.response.data,
+        })
+      );
+  });
+};
+
+export const updateVolunteerPointsFinishTask = (
+  allVolunteersTask,
+  year,
+  typeFinished,
+  difficulty
+) => (dispatch) => {
+  allVolunteersTask.forEach((element) => {
+    console.log(element, year);
+    axios
+      .post("/api/members/updateVolunteerPointsFinishTask", {
+        volunteer_id: element,
+        year: year,
+        type_finished: typeFinished,
+        task_difficulty: difficulty,
+      })
+      .then((res) => {
+        dispatch({
+          type: GET_VOLUNTEERS,
+          payload: res.data,
+        });
+      })
+      .catch((err) =>
+        dispatch({
+          type: GET_ERRORS,
+          payload: err.response.data,
+        })
+      );
+  });
+};
+
+export const updateVolunteerPointsFinishProject = (pm_id, mentor_id, year) => (
+  dispatch
+) => {
+  axios
+    .post("/api/members/updateVolunteerPointsFinishProject", {
+      pm_id: pm_id,
+      mentor_id: mentor_id,
+      year: year,
+    })
+    .then((res) => {
+      dispatch({
+        type: GET_VOLUNTEERS,
         payload: res.data,
       });
     })

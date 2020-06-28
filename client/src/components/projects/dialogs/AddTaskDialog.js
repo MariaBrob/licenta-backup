@@ -28,7 +28,10 @@ import {
   getProjectByID,
   getProjectTasks,
 } from "../../../actions/projectsActions";
-import { returnVolunteerByID } from "../../../actions/membersActions";
+import {
+  returnVolunteerByID,
+  updateVolunteerPointsNewTask,
+} from "../../../actions/membersActions";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -80,8 +83,20 @@ export default function AddTaskDialog(props) {
       )
     );
 
+    dispatch(
+      updateVolunteerPointsNewTask(
+        allVolunteersTask,
+        selectedProject.year,
+        difficulty
+      )
+    );
     dispatch(getProjectTasks(selectedProject._id));
     props.handleClose();
+    setTaskTeam([]);
+    setProjectTeam([]);
+    setDescription("");
+    setDeadline(new Date());
+    setDifficulty("Low");
   };
 
   const handleDiscard = () => {

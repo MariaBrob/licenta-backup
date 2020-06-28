@@ -32,21 +32,6 @@ export const getProjects = () => (dispatch) => {
     .then((res) => {
       const projects = JSON.parse(JSON.stringify(res.data));
 
-      // projects.forEach((project) => {
-      //   axios
-      //     .get("members/getVolunteerByID/" + project.pm)
-      //     .then((pm) => {
-      //       project["pm"] = pm.data[0];
-      //       project["truepm"] = "fuck you";
-      //     })
-      //     .catch((err) =>
-      //       dispatch({
-      //         type: GET_ERRORS,
-      //         payload: err.response.data,
-      //       })
-      //     );
-      // });
-
       dispatch({
         type: GET_PROJECTS,
         payload: projects,
@@ -90,7 +75,7 @@ export const updateProject = (data) => (dispatch) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.log(err.response);
       dispatch({
         type: GET_ERRORS,
         payload: err.response.data,
@@ -206,6 +191,52 @@ export const getProjectTaskByID = (id) => (dispatch) => {
   axios
     .get("/api/projects/getProjectTaskByID/" + id)
     .then((res) => {
+      dispatch({
+        type: GET_PROJECT_TASK_ID,
+        payload: res.data[0],
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      });
+    });
+};
+
+export const finishProject = (id, status, date) => (dispatch) => {
+  axios
+    .post("/api/projects/finishProject", {
+      project_id: id,
+      status: status,
+      date_finished: date,
+    })
+    .then((res) => {
+      console.log(res);
+      dispatch({
+        type: GET_PROJECT_ID,
+        payload: res.data,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      });
+    });
+};
+
+export const finishTask = (id, status, date) => (dispatch) => {
+  axios
+    .post("/api/projects/finishTask", {
+      task_id: id,
+      status: status,
+      date_finished: date,
+    })
+    .then((res) => {
+      console.log(res);
       dispatch({
         type: GET_PROJECT_TASK_ID,
         payload: res.data[0],

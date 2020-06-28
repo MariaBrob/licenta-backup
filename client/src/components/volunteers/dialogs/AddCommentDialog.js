@@ -49,7 +49,7 @@ export default function AddCommentDialog(props) {
         maxWidth="xs"
         fullWidth={true}
       >
-        <DialogTitle>Add Task</DialogTitle>
+        <DialogTitle>Add Comment</DialogTitle>
         <DialogContent>
           <Box mb={2}>
             <Grid container spacing={2}>

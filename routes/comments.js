@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Comment = require("../models/comment.js");
+const Volunteer = require("../models/volunteers.js");
 
 const tf = require("@tensorflow/tfjs");
 const fetch = require("node-fetch");
@@ -85,21 +86,60 @@ router.post("/addComment", (req, res) => {
       result: sentiment,
     });
 
+    let current_year = new Date(date).getFullYear().toString();
     newComment
       .save()
-      .then((volunteer) => {
-        Comment.find({ volunteer_id: volunteer_id })
-          .then((comments) => {
-            res.json(comments);
+      .then(() => {
+        Volunteer.findOne({
+          _id: volunteer_id,
+        })
+          .then((resp) => {
+            let vol_points = resp.points;
+            let year_index = vol_points.findIndex(
+              ({ year }) => year == current_year
+            );
+
+            if (year_index === -1) {
+              vol_points.push({ year: current_year, points: result * 10 });
+            } else {
+              vol_points[year_index].points += result * 10;
+            }
+
+            Volunteer.updateOne(
+              { _id: volunteer_id },
+              {
+                points: vol_points,
+              }
+            )
+              .then(() => {
+                Comment.find({ volunteer_id: volunteer_id })
+                  .then((comments) => {
+                    res.json(comments);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                    return res
+                      .status(500)
+                      .json({ message: "Error adding comment" });
+                  });
+              })
+              .catch((err) => {
+                console.log(err);
+                return res
+                  .status(500)
+                  .json({ message: "Error updating volunteer points" });
+              });
           })
           .catch((err) => {
             console.log(err);
-            return res.json(err);
+            return res
+              .status(500)
+              .json({ message: "Error updating volunteer points" });
           });
       })
       .catch((err) => {
         console.log(err);
-        return res.json(err);
+        return res.status(500).json({ message: "Error adding comment" });
       });
   };
 
@@ -115,7 +155,7 @@ router.get("/getComments/:id", (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      return res.json(err);
+      return res.status(500).json({ message: "Error getting comments" });
     });
 });
 

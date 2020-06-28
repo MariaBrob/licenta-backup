@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   makeStyles,
   Grid,
@@ -56,11 +56,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const createData = (year, name, pm, mentor, budget, id, isEditMode, type) => ({
+const createData = (
   year,
   name,
   pm,
+  pm_id,
   mentor,
+  mentor_id,
+  budget,
+  id,
+  isEditMode,
+  type
+) => ({
+  year,
+  name,
+  pm,
+  pm_id,
+  mentor,
+  mentor_id,
   budget,
   id,
   isEditMode,
@@ -107,6 +120,7 @@ const CustomTableCell = ({ row, name, onChange, type }) => {
                   label="Select entity"
                   value={volunteer.name}
                   key={index}
+                  volunteer_id={volunteer._id}
                   name={volunteer.name}
                 >
                   {volunteer.name}
@@ -134,21 +148,28 @@ function ProjectsTable() {
   const [openDialog, setOpen] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
   var projectRows = [];
-  projects.forEach((project) => {
-    projectRows.push(
-      createData(
-        project.year,
-        project.name,
-        project.pm,
-        project.mentor,
-        project.budget,
-        project._id,
-        false
-      )
-    );
-  });
+
+  useEffect(() => {
+    projects.forEach((project) => {
+      projectRows.push(
+        createData(
+          project.year,
+          project.name,
+          project.pm,
+          project.pm_id,
+          project.mentor,
+          project.mentor_id,
+          project.budget,
+          project._id,
+          false
+        )
+      );
+    });
+
+    setRows(projectRows);
+    // eslint-disable-next-line
+  }, [projects]);
 
   if (projectRows.length !== 0 && rows.length === 0) {
     setRows(projectRows);
@@ -185,7 +206,9 @@ function ProjectsTable() {
   };
 
   const onAdd = () => {
-    projectRows.push(createData("", "", "", "", "", "insert", true, "insert"));
+    projectRows.push(
+      createData("", "", "", "", "", "", "", "insert", true, "insert")
+    );
     setRows(projectRows);
   };
 
@@ -212,7 +235,29 @@ function ProjectsTable() {
     const name = e.target.name;
     const newRows = rows.map((row) => {
       if (row.id === id) {
-        return { ...row, [name]: value };
+        if (name === "pm" || name === "mentor") {
+          if (row.type !== "insert") {
+            let old_id = row[`${name}_id`];
+
+            return {
+              ...row,
+              [`old_${name}_id`]: old_id,
+              [name]: value,
+              [`${name}_id`]: e.currentTarget.getAttribute("volunteer_id"),
+            };
+          } else {
+            return {
+              ...row,
+              [name]: value,
+              [`${name}_id`]: e.currentTarget.getAttribute("volunteer_id"),
+            };
+          }
+        } else {
+          return {
+            ...row,
+            [name]: value,
+          };
+        }
       }
       return row;
     });

@@ -27,6 +27,13 @@ const useStyles = makeStyles((theme) => ({
   },
   textField: {
     color: "#000 !important",
+    cursor: "not-allowed !important",
+    "&:hover": {
+      cursor: "not-allowed !important",
+    },
+  },
+  disabled: {
+    cursor: "not-allowed !important",
   },
   positiveComment: {
     color: "#fff",
@@ -42,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function AddCommentDialog() {
+export default function CommentsCard() {
   const classes = useStyles();
   const selectedComments = useSelector(
     (state) => state.volunteers.selectedVolunteerComments
@@ -85,7 +92,7 @@ export default function AddCommentDialog() {
                   className={classes.customTextField}
                   InputLabelProps={{
                     classes: {
-                      root: classes.textField,
+                      root: (classes.textField, classes.disabled),
                     },
                   }}
                   InputProps={{
