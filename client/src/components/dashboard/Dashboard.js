@@ -31,7 +31,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
-import Chart from "./Chart";
+import Chart from "./volunteersOverview/BestVolunteersChart";
 import Deposits from "./Deposits";
 import Orders from "./Orders";
 
@@ -158,6 +158,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     dispatch(getDepartments());
+    // eslint-disable-next-line
   }, []);
 
   const handleDrawerOpen = () => {

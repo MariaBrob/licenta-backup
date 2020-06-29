@@ -14,18 +14,17 @@ import {
   IconButton,
 } from "@material-ui/core";
 import RemoveRedEye from "@material-ui/icons/RemoveRedEye";
+import Title from "../Title";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
-  getBestVolunteersDep,
+  getWorstVolunteersYear,
   getVolunteerByID,
   getVolunteerProjects,
   getComments,
 } from "../../../actions/membersActions";
 
 import VolunteerDialog from "../../volunteers/VolunteerDialog";
-import { getDepartments } from "../../../actions/departmentsActions";
-import Title from "../Title";
 
 const useStyles = makeStyles({
   root: {
@@ -51,24 +50,17 @@ export default function OutlinedCard() {
   const year = new Date("01/01/2000").getFullYear();
   const years = Array.from(new Array(30), (val, index) => index + year);
   const [selectedYear, setSelectedYear] = React.useState("2020");
-  const [selectedDepartment, setSelectedDepartment] = React.useState("HR");
-
   const [openDialog, setOpen] = React.useState(false);
   const sortedVolunteers = useSelector(
-    (state) => state.volunteers.sortedVolunteersDep
+    (state) => state.volunteers.sortedVolunteersWorstYear
   );
   const selectedVolunteer = useSelector(
     (state) => state.volunteers.selectedVolunteer
   );
-  const departments = useSelector((state) => state.departments.allDepartments);
 
   React.useEffect(() => {
-    dispatch(getDepartments());
-    // eslint-disable-next-line
-  }, []);
-
-  React.useEffect(() => {
-    dispatch(getBestVolunteersDep(selectedYear));
+    dispatch(getWorstVolunteersYear(selectedYear));
+    renderSortedVolunteers();
     // eslint-disable-next-line
   }, [selectedYear]);
 
@@ -94,10 +86,8 @@ export default function OutlinedCard() {
   };
 
   const renderSortedVolunteers = () => {
-    let j = 0;
     return sortedVolunteers.map((volunteer, index) => {
-      if (volunteer.department === selectedDepartment && j < 10) {
-        j++;
+      if (index < 10) {
         return (
           <Paper key={index} elevation={3}>
             <Box m={2}>
@@ -119,7 +109,7 @@ export default function OutlinedCard() {
       <CardContent>
         <Grid container spacing={2}>
           <Grid item md={12}>
-            <Title> Best 10 volunteers {selectedDepartment}</Title>
+            <Title>Worst 10 volunteers</Title>
           </Grid>
         </Grid>
 
@@ -142,36 +132,6 @@ export default function OutlinedCard() {
                     return (
                       <MenuItem value={year} key={index}>
                         {year}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
-          <Grid item md={5}>
-            <Box mt={4}>
-              <FormControl
-                variant="outlined"
-                className={classes.input}
-                fullWidth
-                required
-              >
-                <InputLabel>Department</InputLabel>
-                <Select
-                  value={selectedDepartment}
-                  onChange={(event) =>
-                    setSelectedDepartment(event.target.value)
-                  }
-                  label="Department"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  {departments.map((dep, index) => {
-                    return (
-                      <MenuItem key={index} value={dep.name}>
-                        {dep.name}
                       </MenuItem>
                     );
                   })}

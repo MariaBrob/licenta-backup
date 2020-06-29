@@ -30,7 +30,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
-import Chart from "./Chart";
+import Chart from "./volunteersOverview/BestVolunteersChart";
 
 import { logoutUser } from "../../actions/authActions";
 

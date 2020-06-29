@@ -4,7 +4,6 @@ import {
   Card,
   Paper,
   CardContent,
-  Button,
   Typography,
   FormControl,
   MenuItem,
@@ -18,13 +17,14 @@ import RemoveRedEye from "@material-ui/icons/RemoveRedEye";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
-  getBestVolunteers,
+  getBestVolunteersYear,
   getVolunteerByID,
   getVolunteerProjects,
   getComments,
 } from "../../../actions/membersActions";
 
 import VolunteerDialog from "../../volunteers/VolunteerDialog";
+import Title from "../Title";
 
 const useStyles = makeStyles({
   root: {
@@ -52,14 +52,16 @@ export default function OutlinedCard() {
   const [selectedYear, setSelectedYear] = React.useState("2020");
   const [openDialog, setOpen] = React.useState(false);
   const sortedVolunteers = useSelector(
-    (state) => state.volunteers.sortedVolunteers
+    (state) => state.volunteers.sortedVolunteersYear
   );
   const selectedVolunteer = useSelector(
     (state) => state.volunteers.selectedVolunteer
   );
 
   React.useEffect(() => {
-    dispatch(getBestVolunteers());
+    dispatch(getBestVolunteersYear(selectedYear));
+    renderSortedVolunteers();
+    // eslint-disable-next-line
   }, [selectedYear]);
 
   const handleOpenDialog = (id) => {
@@ -83,14 +85,31 @@ export default function OutlinedCard() {
     }
   };
 
+  const renderSortedVolunteers = () => {
+    return sortedVolunteers.map((volunteer, index) => {
+      if (index < 10) {
+        return (
+          <Paper key={index} elevation={3}>
+            <Box m={2}>
+              <Typography variant="body2" component="p">
+                {volunteer.name} &nbsp;
+                <IconButton onClick={() => handleOpenDialog(volunteer._id)}>
+                  <RemoveRedEye />
+                </IconButton>
+              </Typography>
+            </Box>
+          </Paper>
+        );
+      } else return null;
+    });
+  };
+
   return (
     <Card className={classes.root} variant="outlined">
       <CardContent>
         <Grid container spacing={2}>
           <Grid item md={12}>
-            <Typography variant="h5" component="h2">
-              Best 10 volunteers
-            </Typography>
+            <Title>Best 10 volunteers</Title>
           </Grid>
         </Grid>
 
@@ -124,24 +143,7 @@ export default function OutlinedCard() {
 
         <Grid container spacing={2}>
           <Grid item md={8}>
-            {sortedVolunteers.map((volunteer, index) => {
-              if (index < 10) {
-                return (
-                  <Paper key={index} elevation={3}>
-                    <Box m={2}>
-                      <Typography variant="body2" component="p">
-                        {volunteer.name} &nbsp;
-                        <IconButton
-                          onClick={() => handleOpenDialog(volunteer._id)}
-                        >
-                          <RemoveRedEye />
-                        </IconButton>
-                      </Typography>
-                    </Box>
-                  </Paper>
-                );
-              }
-            })}
+            {renderSortedVolunteers()}
           </Grid>
         </Grid>
       </CardContent>

@@ -282,8 +282,7 @@ router.post("/getBest10VolunteersbyYear", (req, res) => {
       resp.forEach((element) => {
         if (element.points.length > 0) {
           element.points.forEach((pyear) => {
-            if (pyear.year === year) {
-              console.log(pyear);
+            if (pyear.year == year) {
               vol_array.push({
                 _id: element._id,
                 name: element.name,
@@ -294,11 +293,158 @@ router.post("/getBest10VolunteersbyYear", (req, res) => {
           });
         }
       });
+      vol_array = vol_array.sort((a, b) => (a.points < b.points ? 1 : -1));
 
+      res.json(vol_array);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+router.post("/getBest10VolunteersbyDep", (req, res) => {
+  const { year } = req.body;
+  Volunteer.find({})
+    .then((resp) => {
+      var vol_array = [];
+
+      resp.forEach((element) => {
+        if (element.points.length > 0) {
+          element.points.forEach((pyear) => {
+            if (pyear.year == year) {
+              vol_array.push({
+                _id: element._id,
+                name: element.name,
+                department: element.department,
+                points: element.points[0].points,
+              });
+            }
+          });
+        }
+      });
       vol_array = vol_array.sort((a, b) => (a.points < b.points ? 1 : -1));
 
       console.log(vol_array);
+      res.json(vol_array);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
 
+router.post("/getBest10Volunteers", (req, res) => {
+  const { year } = req.body;
+  Volunteer.find({})
+    .then((resp) => {
+      var vol_array = [];
+
+      resp.forEach((element) => {
+        if (element.points.length > 0) {
+          element.points.forEach((pyear) => {
+            if (pyear.year == year) {
+              vol_array.push({
+                _id: element._id,
+                name: element.name,
+                department: element.department,
+                points: element.points[0].points,
+              });
+            }
+          });
+        }
+      });
+      vol_array = vol_array.sort((a, b) => (a.points < b.points ? 1 : -1));
+
+      console.log(vol_array);
+      res.json(vol_array);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+router.post("/getWorst10Volunteers", (req, res) => {
+  const { year } = req.body;
+  Volunteer.find({})
+    .then((resp) => {
+      var vol_array = [];
+
+      resp.forEach((element) => {
+        if (element.points.length > 0) {
+          element.points.forEach((pyear) => {
+            if (pyear.year == year) {
+              vol_array.push({
+                _id: element._id,
+                name: element.name,
+                department: element.department,
+                points: element.points[0].points,
+              });
+            }
+          });
+        }
+      });
+      vol_array = vol_array.sort((a, b) => (a.points > b.points ? 1 : -1));
+
+      console.log(vol_array);
+      res.json(vol_array);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+router.post("/getWorst10VolunteersDep", (req, res) => {
+  const { year } = req.body;
+  Volunteer.find({})
+    .then((resp) => {
+      var vol_array = [];
+
+      resp.forEach((element) => {
+        if (element.points.length > 0) {
+          element.points.forEach((pyear) => {
+            if (pyear.year == year) {
+              vol_array.push({
+                _id: element._id,
+                name: element.name,
+                department: element.department,
+                points: element.points[0].points,
+              });
+            }
+          });
+        }
+      });
+      vol_array = vol_array.sort((a, b) => (a.points > b.points ? 1 : -1));
+
+      console.log(vol_array);
+      res.json(vol_array);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+router.post("/getWorst10VolunteersDepChart", (req, res) => {
+  const { year } = req.body;
+  Volunteer.find({})
+    .then((resp) => {
+      var vol_array = [];
+
+      resp.forEach((element) => {
+        if (element.points.length > 0) {
+          element.points.forEach((pyear) => {
+            if (pyear.year == year) {
+              vol_array.push({
+                _id: element._id,
+                name: element.name,
+                department: element.department,
+                points: element.points[0].points,
+              });
+            }
+          });
+        }
+      });
+      vol_array = vol_array.sort((a, b) => (a.points > b.points ? 1 : -1));
+
+      console.log(vol_array);
       res.json(vol_array);
     })
     .catch((err) => {

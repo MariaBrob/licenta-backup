@@ -19,6 +19,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Box,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -30,8 +31,12 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
+import Chart from "./volunteersOverview/BestVolunteersChart";
+import WorstChart from "./volunteersOverview/WorstVolunteersChart";
 import BestVolunteersCard from "./volunteersOverview/bestVolunteersCard";
 import BestVolunteersDepCard from "./volunteersOverview/bestVolunteersDepCard";
+import WorstVolunteersCard from "./volunteersOverview/WorstVolunteersCard";
+import WorstVolunteersDepCard from "./volunteersOverview/WorstVolunteersDepCard";
 
 import { logoutUser } from "../../actions/authActions";
 
@@ -112,7 +117,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   fixedHeight: {
-    height: 240,
+    height: 500,
   },
   link: {
     color: "#fff",
@@ -152,7 +157,7 @@ export default function Dashboard() {
     dispatch(logoutUser);
   };
 
-  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <div className={classes.root}>
@@ -302,6 +307,39 @@ export default function Dashboard() {
               </Paper>
             </Grid>
           </Grid>
+
+          <Box mt={2} mb={2}>
+            <Grid container spacing={3}>
+              <Grid item md={12}>
+                <Paper className={fixedHeightPaper}>
+                  <Chart />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
+
+          <Grid container spacing={3}>
+            <Grid item md={6}>
+              <Paper>
+                <WorstVolunteersCard />
+              </Paper>
+            </Grid>
+            <Grid item md={6}>
+              <Paper>
+                <WorstVolunteersDepCard />
+              </Paper>
+            </Grid>
+          </Grid>
+
+          <Box mt={2} mb={2}>
+            <Grid container spacing={3}>
+              <Grid item md={12}>
+                <Paper className={fixedHeightPaper}>
+                  <WorstChart />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
         </Container>
       </main>
     </div>

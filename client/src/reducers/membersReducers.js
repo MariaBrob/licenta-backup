@@ -5,6 +5,11 @@ import {
   GET_VOLUNTEER_PROJECTS,
   GET_VOLUNTEER_COMMENTS,
   SORT_VOLUNTEERS_BY_YEAR,
+  SORT_VOLUNTEERS_BY_DEP,
+  SORT_VOLUNTEERS,
+  SORT_VOLUNTEERS_WORST,
+  SORT_VOLUNTEERS_WORST_BY_DEP,
+  SORT_VOLUNTEERS_WORST_ALL,
 } from "../actions/types";
 
 const initialState = {
@@ -13,6 +18,11 @@ const initialState = {
   selectedVolunteerProjects: null,
   selectedVolunteerComments: null,
   sortedVolunteers: [],
+  sortedVolunteersYear: [],
+  sortedVolunteersDep: [],
+  sortedVolunteersWorstYear: [],
+  sortedVolunteersWorstDep: [],
+  sortedVolunteersWorstAll: [],
 };
 
 export default function (state = initialState, action) {
@@ -48,7 +58,32 @@ export default function (state = initialState, action) {
     case SORT_VOLUNTEERS_BY_YEAR:
       return {
         ...state,
+        sortedVolunteersYear: action.payload,
+      };
+    case SORT_VOLUNTEERS_BY_DEP:
+      return {
+        ...state,
+        sortedVolunteersDep: action.payload,
+      };
+    case SORT_VOLUNTEERS:
+      return {
+        ...state,
         sortedVolunteers: action.payload,
+      };
+    case SORT_VOLUNTEERS_WORST:
+      return {
+        ...state,
+        sortedVolunteersWorstYear: action.payload,
+      };
+    case SORT_VOLUNTEERS_WORST_BY_DEP:
+      return {
+        ...state,
+        sortedVolunteersWorstDep: action.payload,
+      };
+    case SORT_VOLUNTEERS_WORST_ALL:
+      return {
+        ...state,
+        sortedVolunteersWorstAll: action.payload,
       };
     default:
       return state;

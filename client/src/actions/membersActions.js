@@ -8,6 +8,11 @@ import {
   GET_VOLUNTEER_PROJECTS,
   GET_VOLUNTEER_COMMENTS,
   SORT_VOLUNTEERS_BY_YEAR,
+  SORT_VOLUNTEERS_BY_DEP,
+  SORT_VOLUNTEERS,
+  SORT_VOLUNTEERS_WORST,
+  SORT_VOLUNTEERS_WORST_BY_DEP,
+  SORT_VOLUNTEERS_WORST_ALL,
 } from "./types";
 
 export const addVolunteer = (data) => (dispatch) => {
@@ -246,12 +251,97 @@ export const updateVolunteerPointsFinishProject = (pm_id, mentor_id, year) => (
     );
 };
 
-export const getBestVolunteers = () => (dispatch) => {
+export const getBestVolunteers = (year) => (dispatch) => {
   axios
-    .post("/api/members/getBest10VolunteersbyYear", { year: "2020" })
+    .post("/api/members/getBest10Volunteers", { year: year })
+    .then((res) => {
+      dispatch({
+        type: SORT_VOLUNTEERS,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getBestVolunteersDep = (year) => (dispatch) => {
+  axios
+    .post("/api/members/getBest10VolunteersbyDep", { year: year })
+    .then((res) => {
+      dispatch({
+        type: SORT_VOLUNTEERS_BY_DEP,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getBestVolunteersYear = (year) => (dispatch) => {
+  axios
+    .post("/api/members/getBest10VolunteersbyYear", { year: year })
     .then((res) => {
       dispatch({
         type: SORT_VOLUNTEERS_BY_YEAR,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getWorstVolunteersYear = (year) => (dispatch) => {
+  axios
+    .post("/api/members/getWorst10Volunteers", { year: year })
+    .then((res) => {
+      dispatch({
+        type: SORT_VOLUNTEERS_WORST,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getWorstVolunteersDep = (year) => (dispatch) => {
+  axios
+    .post("/api/members/getWorst10VolunteersDep", { year: year })
+    .then((res) => {
+      dispatch({
+        type: SORT_VOLUNTEERS_WORST_BY_DEP,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getWorstVolunteersChart = (year) => (dispatch) => {
+  axios
+    .post("/api/members/getWorst10VolunteersDepChart", { year: year })
+    .then((res) => {
+      dispatch({
+        type: SORT_VOLUNTEERS_WORST_ALL,
         payload: res.data,
       });
     })

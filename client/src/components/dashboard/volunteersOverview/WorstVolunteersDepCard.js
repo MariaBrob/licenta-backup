@@ -17,7 +17,7 @@ import RemoveRedEye from "@material-ui/icons/RemoveRedEye";
 
 import { useSelector, useDispatch } from "react-redux";
 import {
-  getBestVolunteersDep,
+  getWorstVolunteersDep,
   getVolunteerByID,
   getVolunteerProjects,
   getComments,
@@ -55,7 +55,7 @@ export default function OutlinedCard() {
 
   const [openDialog, setOpen] = React.useState(false);
   const sortedVolunteers = useSelector(
-    (state) => state.volunteers.sortedVolunteersDep
+    (state) => state.volunteers.sortedVolunteersWorstDep
   );
   const selectedVolunteer = useSelector(
     (state) => state.volunteers.selectedVolunteer
@@ -68,7 +68,7 @@ export default function OutlinedCard() {
   }, []);
 
   React.useEffect(() => {
-    dispatch(getBestVolunteersDep(selectedYear));
+    dispatch(getWorstVolunteersDep(selectedYear));
     // eslint-disable-next-line
   }, [selectedYear]);
 
@@ -119,7 +119,7 @@ export default function OutlinedCard() {
       <CardContent>
         <Grid container spacing={2}>
           <Grid item md={12}>
-            <Title> Best 10 volunteers {selectedDepartment}</Title>
+            <Title>Best 10 volunteers {selectedDepartment}</Title>
           </Grid>
         </Grid>
 
