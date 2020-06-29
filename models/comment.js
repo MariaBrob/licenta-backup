@@ -4,6 +4,7 @@ var commentSchema = new mongoose.Schema(
   {
     volunteer_id: String,
     comment_by: String,
+    comment_by_name: String,
     comment: String,
     date: Date,
     points: String,

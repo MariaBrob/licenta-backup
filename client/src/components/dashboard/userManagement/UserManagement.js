@@ -6,10 +6,10 @@ import {
   Button,
   CssBaseline,
   Drawer,
-  Box,
   AppBar,
   Toolbar,
   List,
+  Box,
   Typography,
   Divider,
   IconButton,
@@ -30,28 +30,13 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
-import Chart from "./volunteersOverview/BestVolunteersChart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
+import Title from "../Title";
+import UsersTable from "./UsersTable";
 
-import { logoutUser } from "../../actions/authActions";
-import { getDepartments } from "../../actions/departmentsActions";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
+import { logoutUser, getAllUsers } from "../../../actions/authActions";
+import { getProjects } from "../../../actions/projectsActions";
 
 const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -154,20 +139,21 @@ export default function Dashboard() {
   const history = useHistory();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+
   const [pmDisable, setPmDisable] = React.useState(false);
   const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    dispatch(getDepartments());
-
     if (user.role === "pm") {
       setPmDisable(true);
     } else {
       setPmDisable(false);
     }
-    // eslint-disable-next-line
+    dispatch(getAllUsers());
+    dispatch(getProjects());
+    renderTable();
+    //eslint-disable-next-line
   }, []);
-
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -180,7 +166,11 @@ export default function Dashboard() {
     dispatch(logoutUser);
   };
 
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const renderTable = () => {
+    if (auth.allUsers) {
+      return <UsersTable />;
+    } else return null;
+  };
 
   return (
     <div className={classes.root}>
@@ -309,28 +299,26 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <Chart />
-              </Paper>
-            </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <Deposits />
-              </Paper>
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Orders />
+            <Grid item md={12}>
+              <Paper>
+                <Box m={2}>
+                  <Grid container spacing={3}>
+                    <Grid item md={12}>
+                      <Title>Users management</Title>
+                    </Grid>
+                  </Grid>
+
+                  <Box mt={3}>
+                    <Grid container spacing={3}>
+                      <Grid item md={12}>
+                        {renderTable()}
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Box>
               </Paper>
             </Grid>
           </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
         </Container>
       </main>
     </div>

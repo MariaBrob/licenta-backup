@@ -1,6 +1,8 @@
 export const GET_ERRORS = "GET_ERRORS";
 export const USER_LOADING = "USER_LOADING";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
+export const SET_ALL_USERS = "SET_ALL_USERS";
+export const SET_EDIT_USERS = "SET_EDIT_USERS";
 
 export const GET_VOLUNTEERS = "GET_VOLUNTEERS";
 export const GET_VOLUNTEERS_DEP = "GET_VOLUNTEERS_DEP";

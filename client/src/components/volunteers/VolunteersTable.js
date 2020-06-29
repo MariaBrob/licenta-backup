@@ -199,7 +199,18 @@ function ProjectsTable(props) {
   const [rows, setRows] = React.useState([]);
   const [previous, setPrevious] = React.useState({});
   const [openDialog, setOpen] = React.useState(false);
+  const [pmDisable, setPmDisable] = React.useState(false);
   var depRows = [];
+  const user = useSelector((state) => state.auth.user);
+
+  useEffect(() => {
+    if (user.role === "pm") {
+      setPmDisable(true);
+    } else {
+      setPmDisable(false);
+    }
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     volunteers.forEach((volunteer) => {
@@ -399,11 +410,13 @@ function ProjectsTable(props) {
                         ) : (
                           <>
                             <IconButton
+                              disabled={pmDisable}
                               onClick={() => onToggleEditMode(row.id)}
                             >
                               <EditIcon />
                             </IconButton>
                             <IconButton
+                              disabled={pmDisable}
                               onClick={() => handleOpenDialog(row.id)}
                             >
                               <RemoveRedEye />

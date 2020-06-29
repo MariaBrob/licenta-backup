@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import clsx from "clsx";
+import { getUser } from "../../actions/authActions";
 import {
   Button,
   CssBaseline,
@@ -19,20 +20,27 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Box,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ExitToAppRoundedIcon from "@material-ui/icons/ExitToAppRounded";
 import PeopleIcon from "@material-ui/icons/People";
-import LayersIcon from "@material-ui/icons/Layers";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
+import { getProjects } from "../../actions/projectsActions";
 
-import Chart from "./volunteersOverview/BestVolunteersChart";
+import Title from "./Title";
 
 import { logoutUser } from "../../actions/authActions";
+import { useEffect } from "react";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -137,6 +145,166 @@ export default function Dashboard() {
   const history = useHistory();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+  const [pmDisable, setPmDisable] = React.useState(false);
+  const user = useSelector((state) => state.auth.user);
+  const selectedUser = useSelector((state) => state.auth.selectedUser);
+  const [editableUser, setEditableUser] = React.useState(selectedUser);
+  const projects = useSelector((state) => state.projects.allProjects);
+
+  useEffect(() => {
+    setEditableUser(selectedUser);
+  }, [selectedUser]);
+
+  useEffect(() => {
+    dispatch(getUser(user.id));
+    setEditableUser(selectedUser);
+
+    if (user.role === "pm") {
+      setPmDisable(true);
+    } else {
+      setPmDisable(false);
+    }
+    dispatch(getProjects());
+
+    // eslint-disable-next-line
+  }, []);
+
+  const renderProjectsDropdown = () => {
+    if (projects.length > 0) {
+      return projects.map((project, index) => {
+        return (
+          <MenuItem key={index} value={project._id}>
+            {`${project.name} ${project.year}`}
+          </MenuItem>
+        );
+      });
+    }
+  };
+
+  const renderPage = () => {
+    if (editableUser !== null) {
+      return (
+        <Grid container spacing={3}>
+          <Grid item md={12}>
+            <Box mt={2} mb={2}>
+              <Grid container spacing={2}>
+                <Grid item md={6}>
+                  <TextField
+                    label="Full name"
+                    variant="outlined"
+                    className={classes.input}
+                    fullWidth
+                    value={editableUser.name}
+                    onChange={(event) =>
+                      setEditableUser({
+                        ...editableUser,
+                        name: event.target.value,
+                      })
+                    }
+                    required
+                    disabled={true}
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    label="Email"
+                    variant="outlined"
+                    className={classes.input}
+                    fullWidth
+                    value={editableUser.email}
+                    onChange={(event) =>
+                      setEditableUser({
+                        ...editableUser,
+                        email: event.target.value,
+                      })
+                    }
+                    required
+                    disabled={true}
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Box mt={2} mb={2}>
+              <Grid container spacing={2}>
+                <Grid item md={6}>
+                  <FormControl
+                    required
+                    fullWidth
+                    className={classes.formControl}
+                  >
+                    <InputLabel>Department</InputLabel>
+                    <Select
+                      value={editableUser.department}
+                      onChange={(event) => {
+                        setEditableUser({
+                          ...editableUser,
+                          department: event.target.value,
+                        });
+                      }}
+                      disabled={true}
+                    >
+                      <MenuItem value={"Board"}>Board</MenuItem>
+                      <MenuItem value={"HR"}>HR</MenuItem>
+                      <MenuItem value={"PR"}>PR</MenuItem>
+                      <MenuItem value={"FR"}>FR</MenuItem>
+                      <MenuItem value={"Visual"}>Visual</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item md={6}>
+                  <FormControl required fullWidth>
+                    <InputLabel>Role</InputLabel>
+                    <Select
+                      fullWidth
+                      value={editableUser.role}
+                      onChange={(event) => {
+                        setEditableUser({
+                          ...editableUser,
+                          role: event.target.value,
+                        });
+                      }}
+                      disabled={true}
+                    >
+                      <MenuItem value={"hr"}>HR</MenuItem>
+                      <MenuItem value={"board"}>Board</MenuItem>
+                      <MenuItem value={"pm"}>Project manager</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Box mt={2} mb={10}>
+              <Grid container spacing={2}>
+                <Grid item md={6}>
+                  <FormControl fullWidth className={classes.formControl}>
+                    <InputLabel>Project</InputLabel>
+                    <Select
+                      value={editableUser.project_id}
+                      onChange={(event) => {
+                        setEditableUser({
+                          ...editableUser,
+                          project_id: event.target.value,
+                        });
+                      }}
+                      disabled={true}
+                    >
+                      <MenuItem value="" disabled>
+                        No project
+                      </MenuItem>
+                      {renderProjectsDropdown()}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Box>
+          </Grid>
+        </Grid>
+      );
+    }
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -239,6 +407,7 @@ export default function Dashboard() {
           </ListItem>
           <ListItem
             button
+            disabled={pmDisable}
             onClick={() => {
               history.push("/volunteers-overview");
             }}
@@ -248,8 +417,9 @@ export default function Dashboard() {
             </ListItemIcon>
             <ListItemText primary="Volunteers overview" />
           </ListItem>
-          <ListItem
+          {/* <ListItem
             button
+            disabled={pmDisable}
             onClick={() => {
               history.push("/projects-overview");
             }}
@@ -258,7 +428,7 @@ export default function Dashboard() {
               <AccountTreeIcon />
             </ListItemIcon>
             <ListItemText primary="Projects overview" />
-          </ListItem>
+          </ListItem> */}
           <ListItem
             button
             onClick={() => {
@@ -270,28 +440,24 @@ export default function Dashboard() {
             </ListItemIcon>
             <ListItemText primary="Users" />
           </ListItem>
-          <ListItem
-            button
-            onClick={() => {
-              history.push("/management");
-            }}
-          >
-            <ListItemIcon>
-              <LayersIcon />
-            </ListItemIcon>
-            <ListItemText primary="Management" />
-          </ListItem>
-        </List>{" "}
+        </List>
         <Divider />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <Chart />
+            <Grid item md={12}>
+              <Paper>
+                <Grid container spacing={3}>
+                  <Grid item md={12}>
+                    <Box m={2}>
+                      <Title>User profile</Title>
+                    </Box>
+                  </Grid>
+                </Grid>
+
+                <Box m={2}>{renderPage()}</Box>
               </Paper>
             </Grid>
           </Grid>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   withStyles,
   makeStyles,
@@ -23,6 +23,13 @@ import ProjectDetails from "./dialogs/ProjectDetails";
 import EditTeamDialog from "./dialogs/EditTeamDialog";
 import TasksTable from "./dialogs/TasksTable";
 import AddTaskDialog from "./dialogs/AddTaskDialog";
+import {
+  getVolunteerByID,
+  getVolunteerProjects,
+  getComments,
+} from "../../actions/membersActions";
+
+import VolunteerDialog from "../volunteers/VolunteerDialog";
 
 const styles = (theme) => ({
   root: {
@@ -97,12 +104,27 @@ export default function CustomizedDialogs(props) {
   const selectedProjectTasks = useSelector(
     (state) => state.projects.selectedProjectTasks
   );
+  const user = useSelector((state) => state.auth.user);
   const departments = useSelector((state) => state.departments.allDepartments);
   const [openTeamDialog, setOpenTeamDialog] = React.useState(false);
   const [openAddTaskDialog, setOpenAddTaskDialog] = React.useState(false);
   // const [openVolunteerDialog, setOpenVolunteerDialog] = React.useState(false);
 
   const bull = <span className={classes.bullet}>•</span>;
+  const [openDialog, setOpen] = React.useState(false);
+  const selectedVolunteer = useSelector(
+    (state) => state.volunteers.selectedVolunteer
+  );
+
+  const [pmDisable, setPmDisable] = React.useState(false);
+  useEffect(() => {
+    if (user.role === "pm") {
+      setPmDisable(true);
+    } else {
+      setPmDisable(false);
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const handleOpenTeamDialog = () => {
     setOpenTeamDialog(true);
@@ -120,6 +142,27 @@ export default function CustomizedDialogs(props) {
   const handleCloseAddTaskDialog = () => {
     dispatch(getProjectTasks(selectedProject._id));
     setOpenAddTaskDialog(false);
+  };
+
+  const handleOpenDialog = (id) => {
+    setOpen(true);
+    dispatch(getVolunteerProjects(id));
+    dispatch(getVolunteerByID(id));
+    dispatch(getComments(id));
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+  };
+
+  const renderVolunteerDialog = () => {
+    if (selectedVolunteer !== null) {
+      return (
+        <VolunteerDialog open={openDialog} handleClose={handleCloseDialog} />
+      );
+    } else {
+      return null;
+    }
   };
 
   // const handleOpenVolunteerDialog = () => {
@@ -202,6 +245,7 @@ export default function CustomizedDialogs(props) {
                               variant="outlined"
                               size="small"
                               onClick={() => handleOpenTeamDialog()}
+                              disabled={pmDisable}
                             >
                               Edit team
                             </Button>
@@ -234,8 +278,8 @@ export default function CustomizedDialogs(props) {
                                             &nbsp;
                                             {element.name}
                                             <IconButton
-                                              className={
-                                                classes.littleEyeButton
+                                              onClick={() =>
+                                                handleOpenDialog(element._id)
                                               }
                                             >
                                               <RemoveRedEye
@@ -330,6 +374,7 @@ export default function CustomizedDialogs(props) {
         open={openAddTaskDialog}
         handleClose={handleCloseAddTaskDialog}
       />
+      {renderVolunteerDialog()}
     </Dialog>
   );
 }

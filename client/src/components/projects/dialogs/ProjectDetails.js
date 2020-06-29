@@ -24,6 +24,13 @@ import RemoveRedEye from "@material-ui/icons/RemoveRedEye";
 
 import { useSelector, useDispatch } from "react-redux";
 import { updateProject, finishProject } from "../../../actions/projectsActions";
+import {
+  getVolunteerByID,
+  getVolunteerProjects,
+  getComments,
+} from "../../../actions/membersActions";
+
+import VolunteerDialog from "../../volunteers/VolunteerDialog";
 // import { updateVolunteerPointsFinishProject } from "../../../actions/membersActions";
 
 const useStyles = makeStyles((theme) => ({
@@ -36,6 +43,7 @@ export default function VolunteerDetails() {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  const user = useSelector((state) => state.auth.user);
   const volunteers = useSelector((state) => state.volunteers.allVolunteers);
   const selectedProject = useSelector(
     (state) => state.projects.selectedProject
@@ -45,6 +53,20 @@ export default function VolunteerDetails() {
   const [openFinishDialog, setOpenFinishDialog] = React.useState(false);
   const year = new Date("01/01/2000").getFullYear();
   const years = Array.from(new Array(30), (val, index) => index + year);
+  const [openDialog, setOpen] = React.useState(false);
+  const selectedVolunteer = useSelector(
+    (state) => state.volunteers.selectedVolunteer
+  );
+
+  const [pmDisable, setPmDisable] = React.useState(false);
+  useEffect(() => {
+    if (user.role === "pm") {
+      setPmDisable(true);
+    } else {
+      setPmDisable(false);
+    }
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     setEditableProject(selectedProject);
@@ -61,6 +83,27 @@ export default function VolunteerDetails() {
 
   const handleClose = () => {
     setOpenFinishDialog(false);
+  };
+
+  const handleOpenDialog = (id) => {
+    setOpen(true);
+    dispatch(getVolunteerProjects(id));
+    dispatch(getVolunteerByID(id));
+    dispatch(getComments(id));
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+  };
+
+  const renderVolunteerDialog = () => {
+    if (selectedVolunteer !== null) {
+      return (
+        <VolunteerDialog open={openDialog} handleClose={handleCloseDialog} />
+      );
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -85,7 +128,7 @@ export default function VolunteerDetails() {
                   name: event.target.value,
                 })
               }
-              disabled={disableEdit}
+              disabled={disableEdit || pmDisable}
               required
             />
           </Grid>
@@ -109,6 +152,7 @@ export default function VolunteerDetails() {
                   })
                 }
                 label="Year"
+                disabled={disableEdit || pmDisable}
               >
                 {years.map((year, index) => {
                   return (
@@ -142,7 +186,7 @@ export default function VolunteerDetails() {
                   });
                 }}
                 label="Project manager"
-                disabled={disableEdit}
+                disabled={disableEdit || pmDisable}
               >
                 {volunteers.map((vol, index) => {
                   return (
@@ -159,7 +203,7 @@ export default function VolunteerDetails() {
             </FormControl>
           </Grid>
           <Grid item md={2}>
-            <IconButton>
+            <IconButton onClick={() => handleOpenDialog(editableProject.pm_id)}>
               <RemoveRedEye />
             </IconButton>
           </Grid>
@@ -185,7 +229,7 @@ export default function VolunteerDetails() {
                   });
                 }}
                 label="Project mentor"
-                disabled={disableEdit}
+                disabled={disableEdit || pmDisable}
               >
                 {volunteers.map((vol, index) => {
                   return (
@@ -202,7 +246,9 @@ export default function VolunteerDetails() {
             </FormControl>
           </Grid>
           <Grid item md={2}>
-            <IconButton>
+            <IconButton
+              onClick={() => handleOpenDialog(editableProject.mentor_id)}
+            >
               <RemoveRedEye />
             </IconButton>
           </Grid>
@@ -222,7 +268,7 @@ export default function VolunteerDetails() {
                   budget: event.target.value,
                 })
               }
-              disabled={disableEdit}
+              disabled={disableEdit || pmDisable}
               required
             />
           </Grid>
@@ -243,18 +289,28 @@ export default function VolunteerDetails() {
 
         <Grid container spacing={2}>
           <Grid item md={6}>
-            <Button variant="outlined" size="small" type="submit">
+            <Button
+              variant="outlined"
+              disabled={pmDisable}
+              size="small"
+              type="submit"
+            >
               Update details
             </Button>
           </Grid>
           <Grid item md={6}>
-            <Button variant="outlined" size="small" onClick={handleClickOpen}>
+            <Button
+              variant="outlined"
+              size="small"
+              disabled={pmDisable}
+              onClick={handleClickOpen}
+            >
               Finish project
             </Button>
           </Grid>
         </Grid>
       </form>
-
+      {renderVolunteerDialog()}
       <FinishProjectDialog open={openFinishDialog} handleClose={handleClose} />
     </Box>
   );

@@ -88,7 +88,7 @@ export default function CommentsCard() {
               <Grid item md={6}>
                 <TextField
                   label="Author"
-                  value={element.comment_by}
+                  value={element.comment_by_name}
                   className={classes.customTextField}
                   InputLabelProps={{
                     classes: {

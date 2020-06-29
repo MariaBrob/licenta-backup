@@ -255,7 +255,7 @@ export default function Dashboard() {
             </ListItemIcon>
             <ListItemText primary="Volunteers overview" />
           </ListItem>
-          <ListItem
+          {/* <ListItem
             button
             onClick={() => {
               history.push("/projects-overview");
@@ -265,7 +265,7 @@ export default function Dashboard() {
               <AccountTreeIcon />
             </ListItemIcon>
             <ListItemText primary="Projects overview" />
-          </ListItem>
+          </ListItem> */}
           <ListItem
             button
             onClick={() => {

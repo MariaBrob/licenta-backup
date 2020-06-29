@@ -24,10 +24,15 @@ const styles = (theme) => ({
   },
 });
 
-const ButtonInTabs = ({ className, onClick, children }) => {
+const ButtonInTabs = ({ className, onClick, children, user_role }) => {
   return (
     <Box display="flex" flexDirection="row-reverse">
-      <Button className={className} onClick={onClick} children={children} />
+      <Button
+        className={className}
+        disabled={user_role === "pm"}
+        onClick={onClick}
+        children={children}
+      />
     </Box>
   );
 };
@@ -125,6 +130,7 @@ class VolunteersTabber extends Component {
                     <ButtonInTabs
                       onClick={() => this.handleOpenAddDialog()}
                       className={classes.addButton}
+                      user_role={this.props.user.role}
                     >
                       <AddIcon color="secondary" />
                       Add volunteer
@@ -154,6 +160,7 @@ VolunteersTabber.propTypes = {
 
 const mapStateToProps = (state) => ({
   departments: state.departments.allDepartments,
+  user: state.auth.user,
   errors: state.errors,
 });
 

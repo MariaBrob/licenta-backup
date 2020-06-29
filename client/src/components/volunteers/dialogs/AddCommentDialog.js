@@ -27,12 +27,13 @@ export default function AddCommentDialog(props) {
   const selectedVolunteer = useSelector(
     (state) => state.volunteers.selectedVolunteer
   );
+  const user = useSelector((state) => state.auth.user);
 
   const [comment, setComment] = React.useState();
   const [date, setDate] = React.useState(new Date());
 
   const handleSubmit = () => {
-    dispatch(addComment(selectedVolunteer._id, date, comment));
+    dispatch(addComment(selectedVolunteer._id, date, comment, user.name));
 
     props.handleClose();
   };

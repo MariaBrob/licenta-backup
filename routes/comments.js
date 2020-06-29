@@ -8,7 +8,13 @@ const fetch = require("node-fetch");
 require("@tensorflow/tfjs-node");
 
 router.post("/addComment", (req, res) => {
-  const { comment, volunteer_id, volunteerby_id, date } = req.body;
+  const {
+    comment,
+    volunteer_id,
+    volunteerby_id,
+    date,
+    volunteer_name,
+  } = req.body;
 
   const getMetaData = async () => {
     const metadata = await fetch(
@@ -80,6 +86,7 @@ router.post("/addComment", (req, res) => {
     const newComment = new Comment({
       volunteer_id: volunteer_id,
       comment_by: volunteerby_id,
+      comment_by_name: volunteer_name,
       comment: text,
       date: date,
       points: result,

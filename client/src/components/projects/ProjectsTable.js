@@ -139,6 +139,8 @@ const CustomTableCell = ({ row, name, onChange, type }) => {
 function ProjectsTable() {
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.auth.user);
   const projects = useSelector((state) => state.projects.allProjects);
   const selectedProject = useSelector(
     (state) => state.projects.selectedProject
@@ -148,28 +150,33 @@ function ProjectsTable() {
   const [openDialog, setOpen] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [pmDisable, setPmDisable] = React.useState(false);
   var projectRows = [];
 
   useEffect(() => {
-    projects.forEach((project) => {
-      projectRows.push(
-        createData(
-          project.year,
-          project.name,
-          project.pm,
-          project.pm_id,
-          project.mentor,
-          project.mentor_id,
-          project.budget,
-          project._id,
-          false
-        )
-      );
-    });
-
-    setRows(projectRows);
+    if (user.role === "pm") {
+      setPmDisable(true);
+    } else {
+      setPmDisable(false);
+    }
     // eslint-disable-next-line
-  }, [projects]);
+  }, []);
+
+  projects.forEach((project) => {
+    projectRows.push(
+      createData(
+        project.year,
+        project.name,
+        project.pm,
+        project.pm_id,
+        project.mentor,
+        project.mentor_id,
+        project.budget,
+        project._id,
+        false
+      )
+    );
+  });
 
   if (projectRows.length !== 0 && rows.length === 0) {
     setRows(projectRows);
@@ -216,11 +223,14 @@ function ProjectsTable() {
     rows.forEach((row) => {
       if (row.id === id) {
         if (type !== "insert") {
-          return dispatch(updateProject(row));
+          dispatch(updateProject(row));
+          window.location.reload();
         } else {
           dispatch(addProject(row));
+          window.location.reload();
         }
-      } else return false;
+      }
+      return true;
     });
     onToggleEditMode(id);
   };
@@ -303,7 +313,7 @@ function ProjectsTable() {
     <span className={classes.root}>
       <Grid container spacing={3}>
         <Grid item md={2}>
-          <Button variant="outlined" onClick={onAdd}>
+          <Button variant="outlined" disabled={pmDisable} onClick={onAdd}>
             Add project
           </Button>
         </Grid>
@@ -378,11 +388,15 @@ function ProjectsTable() {
                           ) : (
                             <>
                               <IconButton
+                                disabled={pmDisable}
                                 onClick={() => onToggleEditMode(row.id)}
                               >
                                 <EditIcon />
                               </IconButton>
                               <IconButton
+                                disabled={
+                                  pmDisable && row.id !== user.project_id
+                                }
                                 onClick={() => handleOpenDialog(row.id)}
                               >
                                 <RemoveRedEye />

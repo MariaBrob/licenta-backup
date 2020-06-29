@@ -14,6 +14,7 @@ import Login from "./components/auth/Login";
 import Dashboard from "./components/dashboard/Dashboard";
 import Profile from "./components/dashboard/Profile";
 import VolunteersOverview from "./components/dashboard/VolunteersOverview";
+import UsersManagement from "./components/dashboard/userManagement/UserManagement";
 
 import Membres from "./components/volunteers/Volunteers";
 import Projects from "./components/projects/Projects";
@@ -48,6 +49,8 @@ class App extends Component {
               <PrivateRoute exact path="/profile" component={Profile} />
               <PrivateRoute exact path="/volunteers" component={Membres} />
               <PrivateRoute exact path="/projects" component={Projects} />
+              <PrivateRoute exact path="/users" component={UsersManagement} />
+
               <PrivateRoute
                 exact
                 path="/volunteers-overview"

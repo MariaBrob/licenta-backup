@@ -21,7 +21,10 @@ router.post("/register", (req, res) => {
       const newUser = new User({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: "zaq12wsx",
+        role: req.body.role,
+        department: req.body.department,
+        project_id: req.body.project_id,
       });
 
       bcrypt.genSalt(10, (err, salt) => {
@@ -30,7 +33,18 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then((user) => res.json(user))
+            .then(() => {
+              User.find({})
+                .then((users) => {
+                  res.json(users);
+                })
+                .catch((err) => {
+                  console.log(err.message);
+                  res.status(500).send({
+                    message: "Error retrieving departments.",
+                  });
+                });
+            })
             .catch((err) => console.log(err));
         });
       });
@@ -39,6 +53,7 @@ router.post("/register", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
+  console.log(req.body);
   const { errors, isValid } = validateLoginInput(req.body);
 
   if (!isValid) {
@@ -57,6 +72,8 @@ router.post("/login", (req, res) => {
         const payload = {
           id: user.id,
           name: user.name,
+          role: user.role,
+          project_id: user.project_id,
         };
 
         jwt.sign(
@@ -66,6 +83,7 @@ router.post("/login", (req, res) => {
             expiresIn: 31556926, // 1 year in seconds
           },
           (err, token) => {
+            console.log(token);
             res.json({
               success: true,
               user_id: user._id,
@@ -80,6 +98,87 @@ router.post("/login", (req, res) => {
       }
     });
   });
+});
+
+router.get("/getAllUsers/", (req, res) => {
+  User.find({})
+    .then((users) => {
+      res.json(users);
+    })
+    .catch((err) => {
+      console.log(err.message);
+      res.status(500).send({
+        message: "Error retrieving departments.",
+      });
+    });
+});
+
+router.get("/getUser/:id", (req, res) => {
+  User.findOne({ _id: req.params.id })
+    .then((user) => {
+      res.json(user);
+      console.log(user);
+    })
+    .catch((err) => {
+      console.log(err.message);
+      res.status(500).send({
+        message: "Error retrieving departments.",
+      });
+    });
+});
+
+router.post("/updateUser", (req, res) => {
+  console.log(req.body);
+  User.updateOne(
+    { _id: req.body._id },
+    {
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+      department: req.body.department,
+    }
+  )
+    .then(() => {
+      User.find({})
+        .then((users) => {
+          res.json(users);
+        })
+        .catch((err) => {
+          console.log(err.message);
+          res.status(500).send({
+            message: "Error retrieving departments.",
+          });
+        });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      res.status(500).send({
+        message: "Error retrieving departments.",
+      });
+    });
+});
+
+router.post("/deleteUser", (req, res) => {
+  console.log(req.body);
+  User.deleteOne({ _id: req.body._id })
+    .then(() => {
+      User.find({})
+        .then((users) => {
+          res.json(users);
+        })
+        .catch((err) => {
+          console.log(err.message);
+          res.status(500).send({
+            message: "Error retrieving departments.",
+          });
+        });
+    })
+    .catch((err) => {
+      console.log(err.message);
+      res.status(500).send({
+        message: "Error retrieving departments.",
+      });
+    });
 });
 
 module.exports = router;

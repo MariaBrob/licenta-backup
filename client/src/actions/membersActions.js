@@ -114,12 +114,15 @@ export const returnVolunteerByID = (id) => {
   });
 };
 
-export const addComment = (volunteer_id, date, comment) => (dispatch) => {
+export const addComment = (volunteer_id, date, comment, volunteer_name) => (
+  dispatch
+) => {
   let volunteerby_id = localStorage.getItem("user_id");
   axios
     .post("/api/comments/addComment", {
       volunteer_id,
       volunteerby_id,
+      volunteer_name,
       date,
       comment,
     })
