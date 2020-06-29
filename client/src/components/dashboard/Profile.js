@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import clsx from "clsx";
@@ -6,7 +6,6 @@ import {
   Button,
   CssBaseline,
   Drawer,
-  Box,
   AppBar,
   Toolbar,
   List,
@@ -32,27 +31,10 @@ import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
 import Chart from "./Chart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
 
 import { logoutUser } from "../../actions/authActions";
-import { getDepartments } from "../../actions/departmentsActions";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
@@ -155,10 +137,6 @@ export default function Dashboard() {
   const history = useHistory();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    dispatch(getDepartments());
-  }, []);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -303,7 +281,7 @@ export default function Dashboard() {
             </ListItemIcon>
             <ListItemText primary="Management" />
           </ListItem>
-        </List>
+        </List>{" "}
         <Divider />
       </Drawer>
       <main className={classes.content}>
@@ -316,22 +294,7 @@ export default function Dashboard() {
                 <Chart />
               </Paper>
             </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <Deposits />
-              </Paper>
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Orders />
-              </Paper>
-            </Grid>
           </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
         </Container>
       </main>
     </div>

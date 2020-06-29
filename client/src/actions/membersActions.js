@@ -7,6 +7,7 @@ import {
   GET_VOLUNTEER_BY_ID,
   GET_VOLUNTEER_PROJECTS,
   GET_VOLUNTEER_COMMENTS,
+  SORT_VOLUNTEERS_BY_YEAR,
 } from "./types";
 
 export const addVolunteer = (data) => (dispatch) => {
@@ -234,6 +235,23 @@ export const updateVolunteerPointsFinishProject = (pm_id, mentor_id, year) => (
     .then((res) => {
       dispatch({
         type: GET_VOLUNTEERS,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data,
+      })
+    );
+};
+
+export const getBestVolunteers = () => (dispatch) => {
+  axios
+    .post("/api/members/getBest10VolunteersbyYear", { year: "2020" })
+    .then((res) => {
+      dispatch({
+        type: SORT_VOLUNTEERS_BY_YEAR,
         payload: res.data,
       });
     })

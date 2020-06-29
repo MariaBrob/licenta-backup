@@ -4,6 +4,7 @@ import {
   GET_VOLUNTEER_BY_ID,
   GET_VOLUNTEER_PROJECTS,
   GET_VOLUNTEER_COMMENTS,
+  SORT_VOLUNTEERS_BY_YEAR,
 } from "../actions/types";
 
 const initialState = {
@@ -11,10 +12,7 @@ const initialState = {
   selectedVolunteer: null,
   selectedVolunteerProjects: null,
   selectedVolunteerComments: null,
-  departments: {
-    board: [],
-    pr: [],
-  },
+  sortedVolunteers: [],
 };
 
 export default function (state = initialState, action) {
@@ -46,6 +44,11 @@ export default function (state = initialState, action) {
       return {
         ...state,
         selectedVolunteerComments: action.payload,
+      };
+    case SORT_VOLUNTEERS_BY_YEAR:
+      return {
+        ...state,
+        sortedVolunteers: action.payload,
       };
     default:
       return state;

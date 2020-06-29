@@ -53,7 +53,7 @@ class Navigation extends Component {
     return (
       <header>
         <div className={classes.root}>
-          <Toolbar className="bcolor" variant="dense">
+          <Toolbar className="bcolor">
             <IconButton
               edge="start"
               className={classes.menuButton}
@@ -76,7 +76,11 @@ class Navigation extends Component {
               </Link>
             </Typography>
 
-            <Typography>{this.props.auth.user.name}</Typography>
+            <Typography>
+              <Link to="/profile" className={classes.link}>
+                {this.props.auth.user.name}
+              </Link>
+            </Typography>
             <Button
               className={classes.logoutButton}
               onClick={this.onLogoutClick}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import clsx from "clsx";
@@ -6,7 +6,6 @@ import {
   Button,
   CssBaseline,
   Drawer,
-  Box,
   AppBar,
   Toolbar,
   List,
@@ -31,25 +30,10 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import AccountTreeIcon from "@material-ui/icons/AccountTree";
 import GroupAddIcon from "@material-ui/icons/GroupAdd";
 
-import Chart from "./Chart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
+import BestVolunteersCard from "./volunteersOverview/bestVolunteersCard";
+import BestVolunteersDepCard from "./volunteersOverview/bestVolunteersDepCard";
 
 import { logoutUser } from "../../actions/authActions";
-import { getDepartments } from "../../actions/departmentsActions";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const drawerWidth = 240;
 
@@ -156,10 +140,6 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    dispatch(getDepartments());
-  }, []);
-
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -172,7 +152,7 @@ export default function Dashboard() {
     dispatch(logoutUser);
   };
 
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  // const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <div className={classes.root}>
@@ -311,27 +291,17 @@ export default function Dashboard() {
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
             {/* Chart */}
-            <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <Chart />
+            <Grid item md={6}>
+              <Paper>
+                <BestVolunteersCard />
               </Paper>
             </Grid>
-            {/* Recent Deposits */}
-            <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <Deposits />
-              </Paper>
-            </Grid>
-            {/* Recent Orders */}
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Orders />
+            <Grid item md={6}>
+              <Paper>
+                <BestVolunteersDepCard />
               </Paper>
             </Grid>
           </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
         </Container>
       </main>
     </div>
